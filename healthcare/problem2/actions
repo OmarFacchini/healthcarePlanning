@@ -1,0 +1,62 @@
+Domain parsed
+Problem parsed
+Grounding..
+Grounding Time: 89
+Aibr Preprocessing
+|F|:126
+|X|:2
+|A|:266
+|P|:0
+|E|:0
+H1 Setup Time (msec): 10
+ g(n)= 1.0 h(n)=26.0
+ g(n)= 2.0 h(n)=25.0
+ g(n)= 3.0 h(n)=24.0
+ g(n)= 5.0 h(n)=23.0
+ g(n)= 6.0 h(n)=22.0
+ g(n)= 8.0 h(n)=19.0
+ g(n)= 9.0 h(n)=18.0
+ g(n)= 10.0 h(n)=17.0
+ g(n)= 11.0 h(n)=16.0
+ g(n)= 12.0 h(n)=14.0
+ g(n)= 13.0 h(n)=13.0
+ g(n)= 15.0 h(n)=12.0
+ g(n)= 16.0 h(n)=10.0
+ g(n)= 17.0 h(n)=7.0
+ g(n)= 18.0 h(n)=5.0
+ g(n)= 19.0 h(n)=2.0
+ g(n)= 20.0 h(n)=1.0
+Problem Solved
+
+Found Plan:
+0.0: (insert_box carrier1 box1 container1 central_warehouse)
+1.0: (insert_item carrier1 box2 defibrillator2 central_warehouse)
+2.0: (insert_box carrier1 box2 container2 central_warehouse)
+3.0: (deploy_box carrier1 container1 box1 central_warehouse)
+4.0: (insert_item carrier1 box1 oxygen1 central_warehouse)
+5.0: (insert_box carrier1 box1 container2 central_warehouse)
+6.0: (pickup_container carrier1 container2 central_warehouse)
+7.0: (move_busy_carrier carrier1 central_warehouse hallway box1 container2)
+8.0: (move_busy_carrier carrier1 hallway emergency_department box1 container2)
+9.0: (deploy_container carrier1 container2 emergency_department)
+10.0: (deploy_box carrier1 container2 box1 emergency_department)
+11.0: (deliver_item carrier1 box1 emergency_department oxygen1 emergency_psychiatric)
+12.0: (insert_box carrier1 box1 container2 emergency_department)
+13.0: (pickup_container carrier1 container2 emergency_department)
+14.0: (move_busy_carrier carrier1 emergency_department hallway box1 container2)
+15.0: (move_busy_carrier carrier1 hallway central_warehouse box1 container2)
+16.0: (move_busy_carrier carrier1 central_warehouse hallway box2 container2)
+17.0: (move_busy_carrier carrier1 hallway emergency_department box2 container2)
+18.0: (deploy_container carrier1 container2 emergency_department)
+19.0: (deploy_box carrier1 container2 box2 emergency_department)
+20.0: (deliver_item carrier1 box2 emergency_department defibrillator2 emergency_trauma)
+
+Plan-Length:21
+Metric (Search):21.0
+Planning Time (msec): 9818
+Heuristic Time (msec): 9474
+Search Time (msec): 9814
+Expanded Nodes:18139
+States Evaluated:106126
+Number of Dead-Ends detected:13728
+Number of Duplicates detected:58328
