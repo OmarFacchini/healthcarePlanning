@@ -14,7 +14,7 @@
 
         ; no definition of number of boxes, start simple with just 2
         box1 box2 - box
-        ;box3 box4 box5 box6 box7 box8 box9 box10 - box
+        box3 box4 box5 box6 box7 - box
 
         ; no definition on number of items, just indirectly stated there can be many of the same item (5 scalpels)
         ; used in emergency_department
@@ -55,6 +55,8 @@
         ; department(location) 3 and the rooms(units) inside of it
         medical_department - location
         medical_post_surgical medical_orthopedics medical_oncology - unit
+
+        total_cost
     
     )
 
@@ -123,16 +125,16 @@
         (at carrier1 central_warehouse)
         (carrier_free carrier1)
 
-        ;(at carrier2 central_warehouse)
-        ;(carrier_free carrier2)
+        (at carrier2 central_warehouse)
+        (carrier_free carrier2)
 
         (at box1 central_warehouse) 
         (at box2 central_warehouse)
-        ;(at box3 central_warehouse)
-        ;(at box4 central_warehouse)
-        ;(at box5 central_warehouse)
-        ;(at box6 central_warehouse)
-        ;(at box7 central_warehouse)
+        (at box3 central_warehouse)
+        (at box4 central_warehouse)
+        (at box5 central_warehouse)
+        (at box6 central_warehouse)
+        (at box7 central_warehouse)
         ;(at box8 central_warehouse)
         ;(at box9 central_warehouse)
         ;(at box10 central_warehouse)
@@ -140,11 +142,11 @@
         ; specify that the boxes are empty (otherwise no item will be inserted in them)
         (is_empty box1)
         (is_empty box2)
-        ;(is_empty box3)
-        ;(is_empty box4)
-        ;(is_empty box5)
-        ;(is_empty box6)
-        ;(is_empty box7)
+        (is_empty box3)
+        (is_empty box4)
+        (is_empty box5)
+        (is_empty box6)
+        (is_empty box7)
         ;(is_empty box8)
         ;(is_empty box9)
         ;(is_empty box10)
@@ -152,11 +154,11 @@
         ; and free
         (box_free box1)
         (box_free box2)
-        ;(box_free box3)
-        ;(box_free box4)
-        ;(box_free box5)
-        ;(box_free box6)
-        ;(box_free box7)
+        (box_free box3)
+        (box_free box4)
+        (box_free box5)
+        (box_free box6)
+        (box_free box7)
         ;(box_free box8)
         ;(box_free box9)
         ;(box_free box10)
@@ -200,14 +202,14 @@
         (need_item emergency_pediatric oxygen2)
 
         ; generale simple case
-        ;(need_item intensive_surgical ventilator1)
-        ;(need_item intensive_cardiac feeding_pump1)
-        ;(need_item intensive_pediatric ventilator2)
+        (need_item intensive_surgical ventilator1)
+        (need_item intensive_cardiac feeding_pump1)
+        (need_item intensive_pediatric ventilator2)
 
         ; another simple case
-        ;(need_item progressive_surgical IV_pump1)
-        ;(need_item progressive_cardiac IV_pump2)
-        ;(need_item progressive_pediatric ECG_machine1)
+        (need_item progressive_surgical IV_pump1)
+        (need_item progressive_cardiac IV_pump2)
+        (need_item progressive_pediatric ECG_machine1)
 
 
         ; assume no units of medical_department need any item, as per part of the goal defined by the problem
@@ -233,34 +235,37 @@
         ; initial load of container is zero(emprty)
         (= (container_load container1) 0)
         (= (container_load container2) 0)
+
+        (= (total_cost) 0)
     )
 
     (:goal 
         (and 
             ; check that patients reached the needed unit
-            ;(has_reached patient1 emergency_trauma)
-            ;(has_reached patient2 intensive_cardiac)
+            (has_reached patient1 emergency_trauma)
+            (has_reached patient2 intensive_cardiac)
 
             ; make sure the patients was also let go from the escorter
-            ;(patient_free patient1)
-            ;(patient_free patient2)
+            (patient_free patient1)
+            (patient_free patient2)
 
             ; also make sure the escorter is free as there are no more patients to escort
-            ;(escorter_free escorter1)
+            (escorter_free escorter1)
 
             ; check for any item of that type that is required by the uni
             ; this allows eg: emergency_trauma unit, which needs a defibrillator, to accept 
             ; either defibrillator1 or defibrillator2
             (exists (?d - defibrillator) (has_item emergency_trauma ?d))
             (exists (?ox - oxygen) (has_item emergency_psychiatric ?ox))
-            ; (exists (?ox - oxygen) (has_item emergency_pediatric ?ox))
-            ; (exists (?v - ventilator) (has_item intensive_surgical ?v))
-            ; (exists (?fp - feeding_pump) (has_item intensive_cardiac ?fp))
-            ; (exists (?v - ventilator) (has_item intensive_pediatric ?v))
-            ; (exists (?ip - IV_pump) (has_item progressive_surgical ?ip))
-            ; (exists (?ip - IV_pump) (has_item progressive_cardiac ?ip))
-            ; (exists (?ec - ECG_machine) (has_item progressive_pediatric ?ec))
+            (exists (?ox - oxygen) (has_item emergency_pediatric ?ox))
+            (exists (?v - ventilator) (has_item intensive_surgical ?v))
+            (exists (?fp - feeding_pump) (has_item intensive_cardiac ?fp))
+            (exists (?v - ventilator) (has_item intensive_pediatric ?v))
+            (exists (?ip - IV_pump) (has_item progressive_surgical ?ip))
+            (exists (?ip - IV_pump) (has_item progressive_cardiac ?ip))
+            (exists (?ec - ECG_machine) (has_item progressive_pediatric ?ec))
 
       )
     )
+    (:metric minimize (total_cost))
 )

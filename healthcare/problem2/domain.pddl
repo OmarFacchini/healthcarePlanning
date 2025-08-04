@@ -1,5 +1,5 @@
 (define (domain healthcare-problem2_general)
-    (:requirements :strips :typing :adl)
+    (:requirements :strips :typing :adl :fluents :action-costs)
     (:types
         ; location we use to indicate position of robots/medical units
         ; patient: atients that need to be accompanied (by robots) to a medical unit
@@ -84,10 +84,6 @@
         ; probably redundant to has_reached, will see which one works best
         (needs_escorting ?p - patient)
 
-        ; is the container empty?
-        ; used to check if the container is empty or not
-        (container_empty ?c - container)
-
         ; is the container free?
         ; used to see if the container is already being moved by a robot or if it's free
         (container_free ?c - container)
@@ -99,9 +95,6 @@
         ; is the robot carrying the container?
         ; modified version of the on predicate of problem1
         (carrying_container ?r - robot_carrier ?c - container)
-
-        ; is the robot carrying a box?
-        (carrying_box ?r - robot_carrier ?b - box)
     )
 
 
@@ -114,7 +107,11 @@
         ; how much is the current container load?
         ; used to check if we can insert another box without going over the limit
         (container_load ?c - container)
+
+        ; since we use metric-ff we need an actual metric to optimize, use total actions
+        (total_cost)
     )
+
 
     ; function not modified wrt to problem 1 as we still insert items in the boxes
     ; insert an item into a box assuming it's empty and free (might remove the empty if i want to have boxes be able to carry more items)
@@ -135,6 +132,8 @@
         :effect (and 
             ; make the box not empty and make the item inside the box
             (not (is_empty ?b)) (inside ?i ?b)
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -173,6 +172,8 @@
 
             ; box stays not free as it was loaded onto the container
             (not (box_free ?b))
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -197,6 +198,8 @@
         :effect (and 
             ; make the robot and the container not free and set robot to be carrying the container
             (not (carrier_free ?r)) (not (container_free ?c)) (carrying_container ?r ?c)
+
+            (increase (total_cost) 1)
         )
     )
     
@@ -225,6 +228,8 @@
             
             ; make the container not be at starting location and make it be at ending location
             (not (at ?c ?from)) (at ?c ?to)
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -244,6 +249,8 @@
         :effect (and 
             ; make the robot and contaier free and set the robot to not be carrying the container
             (carrier_free ?r) (not (carrying_container ?r ?c)) (container_free ?c)
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -261,6 +268,8 @@
             (box_free ?b) (not (on ?b ?c)) (carrier_free ?r)
 
             (decrease (container_load ?c) 1)
+
+            (increase (total_cost) 1)
         )
     )
     
@@ -290,6 +299,8 @@
 
             ; make the item not be inside the box anymore as we just removed it to deliver it to the unit(meaning the box is now empty)
             (not (inside ?i ?b)) (is_empty ?b)
+
+            (increase (total_cost) 1)
         )
     )
     
@@ -310,6 +321,8 @@
         :effect (and 
             ; make the robot not be at starting location and make it be at ending location
             (not (at ?r ?from)) (at ?r ?to)
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -336,6 +349,8 @@
         :effect (and 
             ; make the robot not be at starting location and make it be at ending location
             (not (at ?r ?from)) (at ?r ?to)
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -359,6 +374,8 @@
 
             ; make the patient not be at starting location and make it be at ending location
             (not (at ?p ?from)) (at ?p ?to)
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -377,6 +394,8 @@
         :effect (and 
             ; make the patient being escorted and the robot to be busy
             (not (patient_free ?p)) (not (escorter_free ?r)) (escorting ?r ?p)
+
+            (increase (total_cost) 1)
         )
     )
 
@@ -395,6 +414,8 @@
         )
         :effect (and 
             (not (escorting ?r ?p)) (escorter_free ?r) (has_reached ?p ?u) (patient_free ?p) (not (needs_escorting ?p)) ;not( (needs_to_reach ?p ?u))
+
+            (increase (total_cost) 1)
         )
     )
 
