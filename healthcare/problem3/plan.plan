@@ -1,0 +1,6 @@
+0: SHOP_methodm_escort_patient_4_precondition(escorter1,entrance,patient1)
+1: get_patient(escorter1,patient1,entrance)
+2: SHOP_methodmove_not_connected_1_precondition(entrance,hallway)
+3: move_escorting_accompanier(escorter1,entrance,hallway,patient1)
+4: move_escorting_accompanier(escorter1,hallway,emergency_department,patient1)
+5: drop_off_patient(escorter1,patient1,emergency_department,emergency_trauma)

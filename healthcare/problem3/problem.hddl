@@ -1,0 +1,105 @@
+(define (problem problem3_general)
+    (:domain healthcare-problem3_general)
+
+    (:objects
+
+        ; no definition of number of patient, start simple with just 2
+        patient1 patient2 - patient
+
+        ; problem states we have 1 instance per type of robot
+        ;carrier1 carrier2  - robot_carrier
+        escorter1 - robot_accompany
+
+        ; the constant locations indicated in the problem, starting point of escorter and carrier respectively
+        entrance central_warehouse - location
+
+        ; extra locations to make the example more realistic
+        ; (avoid having the entrance directly connected to a medical section)
+        hallway waiting_room - location
+
+        ; department(location) 1 and the rooms(units) inside of it
+        emergency_department - location
+        emergency_trauma emergency_psychiatric emergency_pediatric - unit
+
+        ; department(location) 2 and the rooms(units) inside of it
+        intensive_care_department - location
+        intensive_surgical intensive_cardiac intensive_pediatric - unit
+        
+        ; department(location) 3 and the rooms(units) inside of it
+        progressive_care_department - location
+        progressive_surgical progressive_cardiac progressive_pediatric - unit
+        
+        ; department(location) 3 and the rooms(units) inside of it
+        medical_department - location
+        medical_post_surgical medical_orthopedics medical_oncology - unit
+    
+    )
+
+    (:htn
+        :tasks (and
+            (escort_patient patient1 emergency_trauma entrance)
+        )
+    )
+
+    (:init
+        ; entrance only connected to main way of walking
+        (are_connected entrance hallway)
+
+        ; central_warehouse only connected to hallway
+        (are_connected central_warehouse hallway)
+        
+        ; hallway connected to basically every location
+        (are_connected hallway entrance)
+        (are_connected hallway waiting_room)
+        (are_connected hallway central_warehouse)
+        (are_connected hallway emergency_department)
+        (are_connected hallway intensive_care_department)
+        (are_connected hallway progressive_care_department)
+        (are_connected hallway medical_department)
+
+        ; waiting_room only connected and hallway
+        (are_connected waiting_room hallway)
+
+        ; the departmnts are only connected to the hallway
+        (are_connected emergency_department hallway)
+        (are_connected intensive_care_department hallway)
+        (are_connected progressive_care_department hallway)
+        (are_connected medical_department hallway)
+
+        ; assign each unit to a department, only 
+        (at emergency_trauma emergency_department)
+        (at emergency_psychiatric emergency_department)
+        (at emergency_pediatric emergency_department)
+
+        (at intensive_surgical intensive_care_department)
+        (at intensive_cardiac intensive_care_department)
+        (at intensive_pediatric intensive_care_department)
+        
+        (at progressive_surgical progressive_care_department)
+        (at progressive_cardiac progressive_care_department)
+        (at progressive_pediatric progressive_care_department)
+        
+        (at medical_post_surgical medical_department)
+        (at medical_orthopedics medical_department)
+        (at medical_oncology medical_department)
+
+
+        ; escorter and patient start at the entrance
+        (at escorter1 entrance)
+        (at patient1 entrance)
+        (at patient2 entrance)
+
+        ; set patient to needing to be escorted
+        (needs_escorting patient1)
+        (needs_escorting patient2)
+
+        ; set the patient and escorter to be free
+        (patient_free patient1)
+        (patient_free patient2)
+        (escorter_free escorter1)
+
+        ; set location that the patients want to reach
+        (needs_to_reach patient1 emergency_trauma)
+        (needs_to_reach patient2 intensive_cardiac)
+    )
+)

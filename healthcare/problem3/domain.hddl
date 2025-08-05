@@ -1,0 +1,334 @@
+(define (domain healthcare-problem3_general)
+    (:requirements :strips :typing :adl :fluents :action-costs :hierachie)
+    (:types
+        ; location we use to indicate position of robots/medical units
+        ; patient: atients that need to be accompanied (by robots) to a medical unit
+        ; robot: generic robot that can be either to accompany people or move boxes
+        ; unit: medical units to which robots bring boxes(with items)/ patients
+        ; item: items in the box/unit to deliver to the unit
+        ; container: addition from problem1 to allow robot_carriers to move more boxes at once
+        patient robot unit box item location container - object
+
+        ; sub class of robots since we want to expand the domain to more kinds of robots
+        ; robot_carrier: robot that carries boxes to units
+        ; robot_accompany: robot that accompanies patients to units
+        robot_carrier robot_accompany - robot
+
+        ; sub class of items since we want to focus on units having a general item and not a specific instance
+        ; eg: care about scalpel, no scalpel5
+        defibrillator oxygen ventilator feeding_pump IV_pump ECG_machine scalpel forcep - item 
+    )
+
+    (:predicates
+        ; could be done for each object (eg: at ?patient - patient ?loc - location, at ?robot - robot ?loc - location)
+        ; which could be easier to understand but would be pointless as this one line is just as equivalent and more generalizable
+        ; (if i add a new object in the types i don't need to also add a new predicate)
+        ; is object ?object of type object (robot, patient, unit, box, items) at location ?loc of type location?
+        ; used to see if something is at the desired location (eg unit is at specific location)
+        (at ?o - object ?loc - location)
+
+        ; are location ?loc1 of type location and location ?loc2 of type location connected? 
+        ; used to see if two locations are connected, needed as robots can only move between connected locations(rooms)
+        (are_connected ?from - location ?to - location)
+
+        ; is item ?i of type item inside the box ?b of type box?
+        ; used to see if an item is in a specific box or not as we need different supplies at different units and we want to bring the right box
+        (inside ?i - item ?b - box)
+
+        ; is box ?b of type box empty?
+        ; used to see if we can insert new items or if it already has something in it
+        (is_empty ?b - box)
+
+        ; does unit ?u of type unit need the item ?i of type item?
+        ; used to see wheter the medical unit needs a necessary item
+        (need_item ?u - unit ?i - item)
+
+        ; does unit ?u of type unit have the item ?i of type item?
+        ; used to keep track of all the items each unit has, needed since we can have more than 1 unit at the same location
+        ; so we cannot track the location of the item/box
+        (has_item ?u - unit ?i - item)
+
+        ; is the robot that carries box ?b of type robot_carrier free?
+        ; used to see if we can pickup a box with the robot or if it already has one
+        (carrier_free ?r - robot_carrier)
+
+        ; is the box ?b of type box free?
+        ; used to see if the box is ready to be picked up from a robot or if it was already picked up
+        ; this is probably useless if we have only 1 robot carrier as we can just check with the on predicate
+        ; but is good in case we have multiple robots
+        (box_free ?b - box)
+
+        ; is the patient ?p of type patient not being escorted?
+        ; used to see if a patient is free or if a robot has already taken charge of him
+        (patient_free ?p - patient)
+
+        ; is the escorter robot ?r free?
+        ; same as box_free and carrier_free but for the robot_accompany
+        (escorter_free ?r - robot_accompany)
+
+        ; is the robot ?r of type robot_accompany escorting patient ?p ?
+        ; used to see if the robot is escorting that patient (probably useless for now, but useful if we have more robots
+        ; and we need to check if that specific robot is escorting that specific patient)
+        (escorting ?r - robot_accompany ?p - patient)
+
+        ; does patient ?p need to reach unit ?u ?
+        ; used to see what unit the patient needs to be escorted to
+        (needs_to_reach ?p - patient ?u - unit)
+
+        ; has the patient ?p reached the needed unit ?u ?
+        ; used to see if the patient has gotten to the unit he wanted
+        (has_reached ?p - patient ?u - unit)
+
+        ; does the patient ?p need escorting?
+        ; used to see if the patient needs escorting or if it's in the desired unit
+        ; probably redundant to has_reached, will see which one works best
+        (needs_escorting ?p - patient)
+
+        ; is the container free?
+        ; used to see if the container is already being moved by a robot or if it's free
+        (container_free ?c - container)
+
+        ; edit of the previous on function, now we don't need to know if the box is on the carrier
+        ; but we need to know if the box is on the container
+        (on ?b - box ?c - container)
+
+        ; is the robot carrying the container?
+        ; modified version of the on predicate of problem1
+        (carrying_container ?r - robot_carrier ?c - container)
+    )
+
+
+    (:functions
+        ; what is the container's capacity? (max weight)
+        ; used to see if the container reached its limit of weight
+        ; might be redundant and using the load could be enough, will see
+        (container_capacity ?c - container)
+
+        ; how much is the current container load?
+        ; used to check if we can insert another box without going over the limit
+        (container_load ?c - container)
+
+        ; since we use metric-ff we need an actual metric to optimize, use total actions
+        (total_cost)
+    )
+
+     (:task move_box
+        :parameters (?r - robot_carrier ?b - box)
+        :precondition ()
+        :effect ()
+    )
+
+    (:task move_container
+        :parameters (?r - robot_carrier ?c - container)
+        :precondition ()
+        :effect ()
+    )
+
+    (:task dismount_item
+        :parameters (?r - robot_carrier ?c - container ?b - box)
+        :precondition ()
+        :effect ()
+    )
+
+    (:task distribute_item
+        :parameters (?r - robot_carrier ?c - container)
+        :precondition ()
+        :effect ()
+    )
+
+
+    (:task escort_patient
+        :parameters (?p - patient ?u - unit ?from - location)
+        :precondition ()
+        :effect ()
+    )
+
+    (:task fetch_patient
+        :parameters (?p - patient ?from - location)
+        :precondition ()
+        :effect ()
+    )
+
+    (:task move_escorting_accompanier_0
+        :parameters (?r - robot_accompany ?from - location ?to - location ?p - patient)
+        :precondition ()
+        :effect ()
+    )
+
+    (:method move_connected
+        :parameters (?r - robot_accompany ?from - location ?to - location ?p - patient)
+        :task (move_escorting_accompanier_0 ?r ?from ?to ?p)
+        :precondition (are_connected ?from ?to)
+        :subtasks ( and
+            (move_escorting_accompanier ?r ?from ?to ?p)
+        )
+    )
+
+    (:method move_not_connected
+        :parameters (?r - robot_accompany ?from - location ?to - location ?p - patient ?step - location)
+        :task (move_escorting_accompanier_0 ?r ?from ?to ?p)
+        :precondition (and
+            (are_connected ?from ?step)
+            (not (= ?step ?to))
+            (not (= ?from ?to))
+
+        )
+        :subtasks ( and
+            (task0 (move_escorting_accompanier ?r ?from ?step ?p))
+            (task1 (move_escorting_accompanier ?r ?step ?to ?p))
+        )
+        :ordering (and
+            (task0 < task1)
+        )
+    )
+
+    
+
+    (:method m_fetch_patient_same_location
+        :parameters (?r - robot_accompany ?p - patient ?from - location)
+        :task (fetch_patient ?p ?from)
+        :precondition (and
+            (escorter_free ?r) (at ?r ?from) (at ?p ?from) (needs_escorting ?p)
+        )
+        :subtasks (and
+            (task1 (get_patient ?r ?p ?from))
+        )
+    )
+
+    (:method m_fetch_patient_different_location
+        :parameters (?r - robot_accompany ?p - patient ?from - location ?to - location)
+        :task (fetch_patient ?p ?from)
+        :precondition(and
+            (escorter_free ?r)
+            (not (and (at ?r ?from) (at ?p ?from)))
+        )
+        :subtasks (and
+            (task0 (move_free_accompanier ?r ?from ?to))
+            (task1 (get_patient ?r ?p ?from))
+        )
+        :ordering (and
+            ; need to get the patient before being able to get him
+            (task0 < task1)
+        )
+    )
+
+
+    (:method m_escort_patient
+        :parameters (?r - robot_accompany ?p - patient ?u - unit ?from - location ?to - location)
+		:task (escort_patient ?p ?u ?from)
+        :precondition (and
+            (escorter_free ?r) (at ?r ?from) (at ?p ?from)
+        )
+		:subtasks (and
+            ;(task0 (fetch_patient ?p ?from))
+            (task0 (get_patient ?r ?p ?from))
+            (task1 (move_escorting_accompanier_0 ?r ?from ?to ?p ))
+            (task2 (drop_off_patient ?r ?p ?to ?u))
+            ;(task3 (move_free_accompanier ?r ?from ?to))
+		)
+		:ordering (and
+            ; need to get the patient before being able to move him
+            (task0 < task1)
+
+            ; need to move the patient to the required unit before dropping him off
+            (task1 < task2)
+
+            ;(task0 < task2)
+		)
+    )
+
+
+    ; ====================
+    ; moved all patient-related functions at the end since the task is only box-related and there is no need to modify the following functions
+
+
+    ; make a free robot move from one location to another (to go fetch a patient)
+    ; honestly not sure if i need this function or if i can just create a move_free_robot and pass the general robot class
+    ; instead of having one per accompany and one per carrier as they are identical except for the subclass
+    (:action move_free_accompanier
+        :parameters (?r - robot_accompany ?from - location ?to - location)
+        :precondition (and 
+            ; check that the robot is at starting location
+            (at ?r ?from)
+
+            ; check that the two locations are connected
+            (are_connected ?from ?to)
+
+            ; since we have a function that moves the robot holding a box, we make sure for this one the robot does not hold a box
+            (escorter_free ?r)
+        )
+        :effect (and 
+            ; make the robot not be at starting location and make it be at ending location
+            (not (at ?r ?from)) (at ?r ?to)
+
+            ;(increase (total_cost) 1)
+        )
+    )
+
+
+    ; make a robot that is escorting a person move from one location to another
+    (:action move_escorting_accompanier
+        :parameters (?r - robot_accompany ?from - location ?to - location ?p - patient)
+        :precondition (and 
+            ; check that the robot is escorting a patient
+            (escorting ?r ?p) (not (escorter_free ?r)) (not (patient_free ?p))
+
+            ; check that the two locations are connected
+            (are_connected ?from ?to)
+
+            ; check that robot and patient are at starting location
+            (at ?r ?from) (at ?p ?from)
+        )
+        :effect (and 
+            ; make the robot not be at starting location and make it be at ending location
+            (not (at ?r ?from)) (at ?r ?to)
+
+            ; make the patient not be at starting location and make it be at ending location
+            (not (at ?p ?from)) (at ?p ?to)
+
+            ;(increase (total_cost) 1)
+        )
+    )
+
+
+    ; TODO 
+    ; make a free robot get a patient at a location
+    (:action get_patient
+        :parameters (?r - robot_accompany ?p - patient ?loc - location)
+        :precondition (and 
+            ; check that both the patient and the robot are free (not being escorted and not escorting anyone)
+            (patient_free ?p) (escorter_free ?r) (needs_escorting ?p)
+
+            ; check that the robot and the patient are at same location
+            (at ?r ?loc) (at ?p ?loc)
+        )
+        :effect (and 
+            ; make the patient being escorted and the robot to be busy
+            (not (patient_free ?p)) (not (escorter_free ?r)) (escorting ?r ?p)
+
+            ;(increase (total_cost) 1)
+        )
+    )
+
+
+    ; TODO this drops off a patient only if it's in the desired(needs_to_reach) unit, if test fails separate this to make it able to drop off
+    ; patients in any location/unit and see if it makes a difference
+    ; make a robot drop a patient off at the desired unit in the location (need unit since there are many units at same location)
+    (:action drop_off_patient
+        :parameters (?r - robot_accompany ?p - patient ?loc - location ?u - unit)
+        :precondition (and 
+            ; check that the robot is escorting the patient and that the patient actually needed to get to this unit
+            (escorting ?r ?p) (not (escorter_free ?r)) (not (patient_free ?p)) (needs_to_reach ?p ?u)
+
+            ; check that the robot, patient and unit are at the same location
+            (at ?r ?loc) (at ?p ?loc) (at ?u ?loc)
+        )
+        :effect (and 
+            (not (escorting ?r ?p)) (escorter_free ?r) (has_reached ?p ?u) (patient_free ?p) (not (needs_escorting ?p)) ;not( (needs_to_reach ?p ?u))
+
+            ;(increase (total_cost) 1)
+        )
+    )
+
+
+)
