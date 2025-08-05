@@ -215,7 +215,8 @@
 
     (:method m_distribute_item
         :parameters (?i - item ?u - unit)
-        :precondition
+        :task (distribute_item ?i ?u)
+        :precondition ()
     )
 
     ; function not modified wrt to problem 1 as we still insert items in the boxes
