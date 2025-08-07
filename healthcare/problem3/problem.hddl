@@ -60,8 +60,11 @@
 
     (:htn
         :tasks (and
-            (escort_patient patient1 emergency_trauma)
-            (escort_patient patient2 intensive_cardiac)
+            ;(escort_patient patient1 emergency_trauma)
+            ;(escort_patient patient2 intensive_cardiac)
+
+            (prepare_container carrier1 central_warehouse container1)
+            (get_container carrier1 central_warehouse container1)
         )
     )
 
