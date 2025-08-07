@@ -1,5 +1,5 @@
-(define (domain healthcare-problem3_general)
-    (:requirements :strips :typing :adl :fluents :action-costs :hierachie)
+(define (domain healthcare-problem3)
+    (:requirements :strips :typing :adl :hierachie)
     (:types
         ; location we use to indicate position of robots/medical units
         ; patient: atients that need to be accompanied (by robots) to a medical unit
@@ -95,34 +95,36 @@
         ; is the robot carrying the container?
         ; modified version of the on predicate of problem1
         (carrying_container ?r - robot_carrier ?c - container)
-    )
 
+        (container_empty ?c - container)
 
-    (:functions
-        ; what is the container's capacity? (max weight)
-        ; used to see if the container reached its limit of weight
-        ; might be redundant and using the load could be enough, will see
-        (container_capacity ?c - container)
+        (container_one_box ?c - container)
 
-        ; how much is the current container load?
-        ; used to check if we can insert another box without going over the limit
-        (container_load ?c - container)
+        (container_two_boxes ?c - container)
+
+        (container_full ?c - container)
     )
 
     (:task load_box
-        :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container)
+        :parameters ()
         :precondition ()
         :effect ()
     )
 
     (:task deploy_box
-        :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container ?u - unit)
+        :parameters ()
         :precondition ()
         :effect ()
     )
 
     (:task move_container
-        :parameters (?r - robot_carrier ?c - container)
+        :parameters ()
+        :precondition ()
+        :effect ()
+    )
+
+    (:task get_container
+        :parameters ()
         :precondition ()
         :effect ()
     )
@@ -146,11 +148,80 @@
         :effect ()
     )
 
-
     (:task move_escorting_accompanier_0
         :parameters (?r - robot_accompany ?from - location ?to - location ?p - patient)
         :precondition ()
         :effect ()
+    )
+
+
+    (:task get_to_patient
+        :parameters (?r - robot_accompany ?p - patient)
+        :precondition (and
+            (escorter_free ?r) (patient_free ?p) (needs_escorting ?p)
+        )
+        :effect ()
+    )
+
+    (:task move_free_escorter
+        :parameters (?r - robot_accompany ?from - location ?to - location)
+        :precondition (and
+            (escorter_free ?r)
+        )
+        :effect ()
+    )
+
+
+    (:method m_get_to_patient
+        :parameters (?r - robot_accompany ?p - patient ?from - location ?to - location)
+        :task (get_to_patient ?r ?p)
+        :precondition (and
+            (at ?r ?from) (at ?p ?to)
+        )
+        :subtasks (and
+            (move_free_escorter ?r ?from ?to)
+
+        )
+    )
+
+    (:method m_get_to_patient_same_location
+        :parameters (?r - robot_accompany ?p - patient ?loc - location)
+        :task (get_to_patient ?r ?p)
+        :precondition (and 
+            (at ?r ?loc)
+            (at ?p ?loc)
+        )
+        :subtasks ()
+    )
+
+
+    (:method m_move_connected_free_escorter
+        :parameters (?r - robot_accompany ?from - location ?to - location)
+        :task (move_free_escorter ?r ?from ?to)
+        :precondition (and 
+            (escorter_free ?r) (are_connected ?from ?to)
+        )
+        :subtasks (and
+            (move_free_accompanier ?r ?from ?to)
+        )
+    )
+
+    (:method m_move_not_connected_free_escorter
+        :parameters (?r - robot_accompany ?from - location ?to - location ?step - location)
+        :task (move_free_escorter ?r ?from ?to)
+        :precondition (and
+            (escorter_free ?r)
+            (are_connected ?from ?step)
+            (not (= ?step ?to))
+            (not (= ?from ?to))
+        )
+        :subtasks (and
+            (task0 (move_free_accompanier ?r ?from ?step))
+            (task1 (move_free_escorter ?r ?step ?to))
+        )
+        :ordering (and
+            (task0 < task1)
+        )
     )
 
 
@@ -171,7 +242,6 @@
             (are_connected ?from ?step)
             (not (= ?step ?to))
             (not (= ?from ?to))
-
         )
         :subtasks ( and
             (task0 (move_escorting_accompanier ?r ?from ?step ?p))
@@ -187,16 +257,18 @@
         :parameters (?r - robot_accompany ?p - patient ?u - unit ?from - location ?to - location)
 		:task (escort_patient ?p ?u ?from)
         :precondition (and
-            (escorter_free ?r) (at ?r ?from) (at ?p ?from)
+            (escorter_free ?r) ;(at ?r ?from) (at ?p ?from)
         )
 		:subtasks (and
-            ;(task0 (fetch_patient ?p ?from))
+            (task3 (get_to_patient ?r ?p))
             (task0 (get_patient ?r ?p ?from))
             (task1 (move_escorting_accompanier_0 ?r ?from ?to ?p ))
             (task2 (drop_off_patient ?r ?p ?to ?u))
             ;(task3 (move_free_accompanier ?r ?from ?to))
 		)
 		:ordering (and
+
+            (task3 < task0)
             ; need to get the patient before being able to move him
             (task0 < task1)
 
@@ -207,16 +279,77 @@
     )
 
 
-    (:method m_move_empty_box
-        :parameters ()
-        :task (move_box ?r ?b)
+    (:method m_get_container_same_location
+        :parameters (?r - robot_carrier ?c - container ?loc - location)
+        :task (get_container)
+        :precondition (and
+            (at ?r ?loc) (at ?c ?loc) (carrier_free ?r) (container_free ?c)
+        )
+        :subtasks (and
+            (pickup_container ?r ?c ?loc)
+        )
     )
 
+    (:method m_move_connected_container
+        :parameters (?r - robot_carrier ?b - box ?from - location ?to - location ?c - container)
+        :task (move_container)
+        :precondition (and
+            (at ?r ?from) (at ?b ?from) (at ?c ?from) (carrying_container ?r ?c) (on ?b ?c)
+            (are_connected ?from ?to)
+        )
+        :subtasks (and
+            (move_busy_carrier ?r ?from ?to ?b ?c)
+        )
+    )
+
+    (:method m_load_first_box
+        :parameters (?r - robot_carrier ?i - item ?b - box ?loc - location ?c - container)
+        :task (load_box)
+        :precondition (and
+            (carrier_free ?r) (box_free ?b) (container_free ?c) (container_empty ?c)
+            (at ?r ?loc) (at ?b ?loc) (at ?c ?loc) (at ?i ?loc)
+        )
+        :subtasks (and
+            (insert_item ?r ?b ?i ?loc)
+            (insert_box_1 ?r ?b ?c ?loc)
+        )
+    )
+
+    (:method m_load_second_box
+        :parameters (?r - robot_carrier ?i - item ?b - box ?loc - location ?c - container)
+        :task (load_box)
+        :precondition (and
+            (carrier_free ?r) (box_free ?b) (container_free ?c)  (not (container_full ?c)) (not (container_empty ?c)) (container_one_box ?c)
+            (at ?r ?loc) (at ?b ?loc) (at ?c ?loc) (at ?i ?loc)
+        )
+        :subtasks (and
+            (insert_item ?r ?b ?i ?loc)
+            (insert_box_2 ?r ?b ?c ?loc)
+        )
+    )
+
+    (:method m_load_last_box
+        :parameters (?r - robot_carrier ?i - item ?b - box ?loc - location ?c - container)
+        :task (load_box)
+        :precondition (and
+            (carrier_free ?r) (box_free ?b) (container_free ?c)  (not (container_full ?c)) (not (container_empty ?c)) (container_two_boxes ?c)
+            (at ?r ?loc) (at ?b ?loc) (at ?c ?loc) (at ?i ?loc)
+        )
+        :subtasks (and
+            (insert_item ?r ?b ?i ?loc)
+            (insert_box_3 ?r ?b ?c ?loc)
+        )
+    )
 
     (:method m_distribute_item
         :parameters (?i - item ?u - unit)
         :task (distribute_item ?i ?u)
-        :precondition ()
+        :precondition (and 
+            (need_item ?u ?i)
+        )
+        :subtasks(
+
+        )
     )
 
     ; function not modified wrt to problem 1 as we still insert items in the boxes
@@ -241,43 +374,77 @@
         )
     )
 
-    ; ; insert a box into a container
-    ; (:action insert_box
-    ;     :parameters (?r - robot_carrier ?b - box ?c - container ?loc - location)
-    ;     :precondition (and 
-    ;         ; check that the box is free and not empty
-    ;         ; similar to later, if the box is empty it will be left at the location which might be an issue, will see
-    ;         ;(not (is_empty ?b)) (box_free ?b)
-    ;         ; check that the box is not free (picked up by the robot), can probably remove the not free
+    ; insert a box into a container
+    (:action insert_box_1
+        :parameters (?r - robot_carrier ?b - box ?c - container ?loc - location)
+        :precondition (and 
+            ; check that the container, box and carrier are free and container is empty
+            (container_free ?c) (box_free ?b) (carrier_free ?r) (container_empty ?c)
 
-    ;         ; check that the container is free
-    ;         (container_free ?c) (box_free ?b) (carrier_free ?r)
+            ; check that the robot, box and container are at the same location
+            (at ?r ?loc) (at ?b ?loc) (at ?c ?loc)
+        )
+        :effect (and 
+            ; make the box to be onto the container
+            (on ?b ?c)
 
-    ;         ; check that the box is not already on the container (can probably remove since carrying_box already implies it)
-    ;         ;(not (on ?b ?c))
-    ;         ;(forall (?localb - box) (not (on ?localb ?c)) )
+            ; make the container have one box
+            (container_one_box ?c) (not (container_empty ?c))
 
-    ;         ; check that adding a(1) box to the current load of the container doesn't overflow
-    ;         ; note: using >= as we want to reach the full capacity(container is full)
-    ;         ; in this case we also assume the capacity to be in boxes number and not in weight (hence increase by 1)
-    ;         (>= (container_capacity ?c) (+ (container_load ?c) 1))
+            ; box stays not free as it was loaded onto the container
+            (not (box_free ?b))
+        )
+    )
 
-    ;         ; check that the robot, box and container are at the same location
-    ;         (at ?r ?loc) (at ?b ?loc) (at ?c ?loc)
-    ;     )
-    ;     :effect (and 
-    ;         ; make the box to be onto the container
-    ;         (on ?b ?c)
+    ; insert a box into a container
+    (:action insert_box_2
+        :parameters (?r - robot_carrier ?b - box ?c - container ?loc - location)
+        :precondition (and 
+            ; check that the container, box and carrier are free and container is not full 
+            (container_free ?c) (box_free ?b) (carrier_free ?r) (not (container_full ?c))
 
-    ;         ; increase the current load of the container by 1 box
-    ;         ; could either increase the load or decrease the capacity
-    ;         ; should be equivalent, personally prefer to reason on reaching capacity rather than reaching zero
-    ;         (increase (container_load ?c) 1)
+            ; check that the container is carrying one box already
+            (container_one_box ?c)
 
-    ;         ; box stays not free as it was loaded onto the container
-    ;         (not (box_free ?b))
-    ;     )
-    ; )
+            ; check that the robot, box and container are at the same location
+            (at ?r ?loc) (at ?b ?loc) (at ?c ?loc)
+        )
+        :effect (and 
+            ; make the box to be onto the container
+            (on ?b ?c)
+
+            ; make the container have 2 boxes
+            (container_two_boxes ?c) (not (container_one_box ?c))
+
+            ; box stays not free as it was loaded onto the container
+            (not (box_free ?b))
+        )
+    )
+
+    ; insert a box into a container
+    (:action insert_box_3
+        :parameters (?r - robot_carrier ?b - box ?c - container ?loc - location)
+        :precondition (and 
+            ; check that the container, box and carrier are free and container is not full 
+            (container_free ?c) (box_free ?b) (carrier_free ?r) (not (container_full ?c))
+
+            ; check that the container is carrying two boxes already
+            (container_two_boxes ?c)
+
+            ; check that the robot, box and container are at the same location
+            (at ?r ?loc) (at ?b ?loc) (at ?c ?loc)
+        )
+        :effect (and 
+            ; make the box to be onto the container
+            (on ?b ?c)
+
+            ; make the container full
+            (container_full ?c) (not (container_two_boxes ?c))
+
+            ; box stays not free as it was loaded onto the container
+            (not (box_free ?b))
+        )
+    )
 
 
     ; make a free robot pick up a free container at a location
@@ -287,12 +454,6 @@
         :precondition (and 
             ; check that the carrier and the container are free
             (carrier_free ?r) (container_free ?c)
-
-            ; check that the container is not empty
-            ; probably creates issues as if it delivers a box and the container becomes empty
-            ; the robot will not pick it back up and leave it at the unit (wrong since we only have 1 container per robot)
-            ; might make it a dual function with pickup_empty and pickup to make sure there are no issues, will see if this works already or not first
-            ;(not (container_empty ?c))
             
             ; check that the robot and box are at the same location
             (at ?r ?loc) (at ?c ?loc)
@@ -351,22 +512,61 @@
     )
 
 
-    (:action deploy_box
+    (:action deploy_box_1
         :parameters (?r - robot_carrier ?c - container ?b - box ?loc - location)
         :precondition (and 
             ; check that the carrier and container are free and that the box is still busy and on the container
             (carrier_free ?r) (container_free ?c) (not (box_free ?b)) (on ?b ?c)
+
+            (container_one_box ?c)
 
             ; check that robot, container and box are at the same location
             (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
         )
         :effect (and 
             (box_free ?b) (not (on ?b ?c)) (carrier_free ?r)
+            
+            (container_empty ?c) (not (container_one_box ?c))
 
-            (decrease (container_load ?c) 1)
         )
     )
-    
+
+    (:action deploy_box_2
+        :parameters (?r - robot_carrier ?c - container ?b - box ?loc - location)
+        :precondition (and 
+            ; check that the carrier and container are free and that the box is still busy and on the container
+            (carrier_free ?r) (container_free ?c) (not (box_free ?b)) (on ?b ?c)
+
+            (container_two_boxes ?c)
+
+            ; check that robot, container and box are at the same location
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :effect (and 
+            (box_free ?b) (not (on ?b ?c)) (carrier_free ?r)
+            
+            (container_one_box ?c) (not (container_two_boxes ?c))
+        )
+    )
+
+    (:action deploy_box_3
+        :parameters (?r - robot_carrier ?c - container ?b - box ?loc - location)
+        :precondition (and 
+            ; check that the carrier and container are free and that the box is still busy and on the container
+            (carrier_free ?r) (container_free ?c) (not (box_free ?b)) (on ?b ?c)
+
+            (container_full ?c)
+
+            ; check that robot, container and box are at the same location
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :effect (and 
+            (box_free ?b) (not (on ?b ?c)) (carrier_free ?r)
+            
+            (container_two_boxes ?c) (not (container_full ?c))
+
+        )
+    ) 
 
     ; ; delivers an item from a box to a unit that needs it and does not have it
     (:action deliver_item
@@ -439,8 +639,6 @@
         :effect (and 
             ; make the robot not be at starting location and make it be at ending location
             (not (at ?r ?from)) (at ?r ?to)
-
-            ;(increase (total_cost) 1)
         )
     )
 
@@ -464,8 +662,6 @@
 
             ; make the patient not be at starting location and make it be at ending location
             (not (at ?p ?from)) (at ?p ?to)
-
-            ;(increase (total_cost) 1)
         )
     )
 
@@ -484,8 +680,6 @@
         :effect (and 
             ; make the patient being escorted and the robot to be busy
             (not (patient_free ?p)) (not (escorter_free ?r)) (escorting ?r ?p)
-
-            ;(increase (total_cost) 1)
         )
     )
 
@@ -503,9 +697,7 @@
             (at ?r ?loc) (at ?p ?loc) (at ?u ?loc)
         )
         :effect (and 
-            (not (escorting ?r ?p)) (escorter_free ?r) (has_reached ?p ?u) (patient_free ?p) (not (needs_escorting ?p)) ;not( (needs_to_reach ?p ?u))
-
-            ;(increase (total_cost) 1)
+            (not (escorting ?r ?p)) (escorter_free ?r) (has_reached ?p ?u) (patient_free ?p) (not (needs_escorting ?p)) (not (needs_to_reach ?p ?u))
         )
     )
 
