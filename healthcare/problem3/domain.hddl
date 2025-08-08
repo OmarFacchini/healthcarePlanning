@@ -133,7 +133,6 @@
         :effect ()
     )
 
-
     (:task prepare_container
         :parameters (?r - robot_carrier ?loc - location ?c - container)
         :precondition ()
@@ -158,6 +157,11 @@
         :effect ()
     )
 
+    (:task deploy_boxes_until_needed 
+        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?loc - location)
+        :precondition ()
+        :effect ()
+    )
 
     (:task get_container
         :parameters (?r - robot_carrier ?loc - location ?c - container)
@@ -179,9 +183,25 @@
         :effect ()
     )
 
+    (:task bring_three_items
+        :parameters (?i1 - item ?u1 - unit ?i2 - item ?u2 - unit ?i3 - item ?u3 - unit)
+        :precondition (and
+            (need_item ?u1 ?i1) (not (has_item ?u1 ?i1))
+            (need_item ?u2 ?i2) (not (has_item ?u2 ?i2))
+            (need_item ?u3 ?i3) (not (has_item ?u3 ?i3))
+        )
+        :effect ()
+    )
+
+    (:method m_bring_three_items
+        :parameters (?r - robot_carrier ?c - container ?i1 - item ?u1 - unit ?i2 - item ?u2 - unit ?i3 - unit ?from - location ?to - location)
+        :task (bring_three_items ?i1 ?u1 ?i2 ?u2 ?i3 ?u3)
+        :precondition ()
+        :subtasks ()
+    )
 
     (:method m_bring_item
-        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?from - location ?to - location ?b - box)
+        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?from - location ?to - location)
         :task (bring_item ?i ?u)
         :precondition (and
             (carrier_free ?r) (container_free ?c)
@@ -192,7 +212,7 @@
             (task1 (get_container ?r ?from ?c))
             (task2 (move_busy_carry ?r ?from ?to))
             (task3 (deploy_container ?r ?c ?to))
-            (task4 (deploy_box ?r ?b ?to ?c))
+            (task4 (deploy_boxes_until_needed ?r ?c ?u ?i ?to))
         )
         :ordering (and
             (task0 < task1)
@@ -201,7 +221,6 @@
             (task3 < task4)
         )
     )
-
 
     (:method m_move_busy_connected_carrier
         :parameters (?r - robot_carrier ?from - location ?to - location ?b - box ?c - container)
@@ -229,7 +248,6 @@
         )
     )
 
-
     (:method m_get_container_same_location
         :parameters (?r - robot_carrier ?loc - location ?c - container)
         :task (get_container ?r ?loc ?c)
@@ -242,37 +260,79 @@
         )
     )
 
+    (:method m_deploy_boxes_until_needed_loop
+        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?b - box ?loc - location)
+        :task (deploy_boxes_until_needed ?r ?c ?u ?i ?loc)
+        :precondition (and
+            (need_item ?u ?i) (on ?b ?c) (not (has_item ?u ?i)) (not (container_empty ?c))
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :subtasks (and
+            (task0 (deploy_box ?r ?b ?loc ?c ?u ?i))
+            (task1 (deploy_boxes_until_needed ?r ?c ?u ?i ?loc))
+        )
+    )
 
+    (:method m_deploy_boxes_until_needed_stop
+        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?loc - location)
+        :task (deploy_boxes_until_needed ?r ?c ?u ?i ?loc)
+        :precondition (and
+            (has_item ?u ?i) (not (need_item ?u ?i))
+        )
+        :subtasks ()
+    )
 
+    (:method m_deploy_boxes_until_needed_empty
+        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?loc - location)
+        :task (deploy_boxes_until_needed ?r ?c ?u ?i ?loc)
+        :precondition (and
+            (need_item ?u ?i) (container_empty ?c)
+        )
+        :subtasks ()
+    )
 
+    (:method m_deploy_first_box_empty
+        :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container ?u - unit ?i - item)
+        :task (deploy_box ?r ?b ?loc ?c ?u ?i)
+        :precondition (and
+            (carrier_free ?r) (not (box_free ?b)) (is_empty ?b)
+            (container_one_box ?c) (on ?b ?c)
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :subtasks (and
+            (task0 (deploy_box_1 ?r ?c ?b ?loc))
+        )
 
-
-
-
-    ; (:method m_deploy_many_boxes
-    ;     :parameters (?r - robot_carrier ?c - container ?loc - location ?u - unit ?i - item)
-    ;     :task (deploy_box ?r ?b ?loc ?c ?u ?i)
-    ;     :precondition (and
-    ;         (not (container_empty ?c)) (need_item ?u ?i)
-    ;         (at ?r ?loc) (at ?c ?loc)
-    ;     )
-    ;     :subtasks (and
-    ;         (task0 ())
-    ;     )
-    ; )
-
-
+    )
 
     (:method m_deploy_first_box
         :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container ?u - unit ?i - item)
         :task (deploy_box ?r ?b ?loc ?c ?u ?i)
         :precondition (and
-            (carrier_free ?r) (not (box_free ?b)) 
+            (carrier_free ?r) (not (box_free ?b)) (not (is_empty ?b)) (inside ?i ?b)
             (container_one_box ?c) (on ?b ?c)
             (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
         )
         :subtasks (and
-            (task1 (deploy_box_1 ?r ?c ?b ?loc))
+            (task0 (deploy_box_1 ?r ?c ?b ?loc))
+            (task1 (deliver_item ?r ?b ?loc ?i ?u))
+        )
+        :ordering (and
+            (task0 < task1)
+        )
+
+    )
+
+    (:method m_deploy_second_box_empty
+        :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container ?u - unit ?i - item)
+        :task (deploy_box ?r ?b ?loc ?c ?u ?i)
+        :precondition (and
+            (carrier_free ?r) (not (box_free ?b)) (is_empty ?b)
+            (container_one_box ?c) (on ?b ?c)
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :subtasks (and
+            (task0 (deploy_box_2 ?r ?c ?b ?loc))
         )
 
     )
@@ -281,29 +341,49 @@
         :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container)
         :task (deploy_box ?r ?b ?loc ?c ?u ?i)
         :precondition (and
-            (carrier_free ?r) (not (box_free ?b)) 
+            (carrier_free ?r) (not (box_free ?b)) (not (is_empty ?b)) (inside ?i ?b)
             (container_two_boxes ?c) (on ?b ?c)
             (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
         )
         :subtasks (and
-            (task1 (deploy_box_2 ?r ?c ?b ?loc))
+            (task0 (deploy_box_2 ?r ?c ?b ?loc))
+            (task1 (deliver_item ?r ?b ?loc ?i ?u))
         )
+        :ordering (and
+            (task0 < task1)
+        )
+    )
+
+    (:method m_deploy_last_box_empty
+        :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container ?u - unit ?i - item)
+        :task (deploy_box ?r ?b ?loc ?c ?u ?i)
+        :precondition (and
+            (carrier_free ?r) (not (box_free ?b)) (is_empty ?b)
+            (container_one_box ?c) (on ?b ?c)
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :subtasks (and
+            (task0 (deploy_box_3 ?r ?c ?b ?loc))
+        )
+
     )
 
     (:method m_deploy_last_box
         :parameters (?r - robot_carrier ?b - box ?loc - location ?c - container)
         :task (deploy_box ?r ?b ?loc ?c ?u ?i)
         :precondition (and
-            (carrier_free ?r) (not (box_free ?b)) 
+            (carrier_free ?r) (not (box_free ?b)) (not (is_empty ?b)) (inside ?i ?b)
             (container_full ?c) (on ?b ?c)
             (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
         )
         :subtasks (and
-            (task1 (deploy_box_3 ?r ?c ?b ?loc))
+            (task0 (deploy_box_3 ?r ?c ?b ?loc))
+            (task1 (deliver_item ?r ?b ?loc ?i ?u))
+        )
+        :ordering (and
+            (task0 < task1)
         )
     )
-
-    
 
     (:method m_load_first_box
         :parameters (?r - robot_carrier ?i - item ?b - box ?loc - location ?c - container)
@@ -430,48 +510,6 @@
             (prepare_container ?r ?loc ?c)
         )
     )
-
-
-    ; (:task move_container
-    ;     :parameters ()
-    ;     :precondition ()
-    ;     :effect ()
-    ; )
-
-    ; (:task dismount_item
-    ;     :parameters (?r - robot_carrier ?c - container ?b - box)
-    ;     :precondition ()
-    ;     :effect ()
-    ; )
-
-    ; (:task distribute_item
-    ;     :parameters (?i - item ?u - unit)
-    ;     :precondition ()
-    ;     :effect ()
-    ; )
-
-    ; (:method m_move_connected_container
-    ;     :parameters (?r - robot_carrier ?b - box ?from - location ?to - location ?c - container)
-    ;     :task (move_container)
-    ;     :precondition (and
-    ;         (at ?r ?from) (at ?b ?from) (at ?c ?from) (carrying_container ?r ?c) (on ?b ?c)
-    ;         (are_connected ?from ?to)
-    ;     )
-    ;     :subtasks (and
-    ;         (move_busy_carrier ?r ?from ?to ?b ?c)
-    ;     )
-    ; )
-
-    ; (:method m_distribute_item
-    ;     :parameters (?i - item ?u - unit)
-    ;     :task (distribute_item ?i ?u)
-    ;     :precondition (and 
-    ;         (need_item ?u ?i)
-    ;     )
-    ;     :subtasks(
-
-    ;     )
-    ; )
 
 
 

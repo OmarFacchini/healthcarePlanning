@@ -60,16 +60,11 @@
 
     (:htn
         :tasks (and
-            ;(escort_patient patient1 emergency_trauma)
-            ;(escort_patient patient2 intensive_cardiac)
-
-            ;(prepare_container carrier1 central_warehouse container1)
-            ;(get_container carrier1 central_warehouse container1)
-            ;(load_empty_box carrier1 box1 central_warehouse container1)
-            ;(get_container carrier1 central_warehouse container1)
-            ;(move_busy_carry carrier1 central_warehouse emergency_department)
-            ;(deploy_box carrier1 box1 central_warehouse container1)
+            (escort_patient patient1 emergency_trauma)
+            (escort_patient patient2 intensive_cardiac)
             (bring_item defibrillator1 emergency_trauma)
+            ;(bring_item ventilator1 intensive_surgical)
+            ;(bring_item feeding_pump1 intensive_cardiac)
         )
     )
 
