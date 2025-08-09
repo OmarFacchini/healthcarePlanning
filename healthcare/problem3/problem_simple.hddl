@@ -62,14 +62,14 @@
 
     (:htn
         :tasks (and
-            ;(escort_patient patient1 emergency_trauma)
-            (escort_patient patient2 intensive_cardiac)
+            (escort_patient patient1 emergency_trauma)
+            ;(escort_patient patient2 intensive_cardiac)
+            ;(insert_box_1 carrier1 box1 container1 central_warehouse)
+            ;(insert_box_2 carrier1 box2 container1 central_warehouse)
+            ;(insert_box_3 carrier1 box3 container1 central_warehouse)
             ;(pickup_container carrier1 container1 central_warehouse)
-            ;(get_carrier_to_items carrier1 ventilator1)
-            ;(deploy_container carrier1 container1 central_warehouse)
-            (bring_item defibrillator1 emergency_trauma)
-            ;(bring_item ventilator1 intensive_surgical)
-            ;(bring_item feeding_pump1 intensive_cardiac)
+            ;(get_carrier_to_items carrier1 ventilator1 central_warehouse medical_department container1)
+            (deliver_one_item carrier1 ventilator1 intensive_surgical intensive_care_department container1)
         )
     )
 
@@ -175,7 +175,7 @@
         (at oxygen1 central_warehouse)
         (at oxygen2 central_warehouse)
 
-        (at ventilator1 central_warehouse)
+        (at ventilator1 medical_department)
         (at ventilator2 central_warehouse)
         (at feeding_pump1 central_warehouse)
         (at feeding_pump2 central_warehouse)
