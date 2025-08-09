@@ -1,4 +1,4 @@
-(define (domain healthcare-problem3)
+(define (domain problem3_general_simple)
     (:requirements :strips :typing :adl :hierachie)
     (:types
         ; location we use to indicate position of robots/medical units
@@ -183,51 +183,75 @@
         :effect ()
     )
 
-    (:task bring_three_items
-        :parameters (?i1 - item ?u1 - unit ?i2 - item ?u2 - unit ?i3 - item ?u3 - unit)
-        :precondition (and
-            (need_item ?u1 ?i1) (not (has_item ?u1 ?i1))
-            (need_item ?u2 ?i2) (not (has_item ?u2 ?i2))
-            (need_item ?u3 ?i3) (not (has_item ?u3 ?i3))
-        )
+    (:task get_carrier_to_items
+        :parameters (?r - robot_carrier ?i - item)
+        :precondition ()
         :effect ()
     )
 
-    (:method m_bring_three_items
-        :parameters (?r - robot_carrier ?c - container ?i1 - item ?u1 - unit ?i2 - item ?u2 - unit ?i3 - unit ?from - location ?to - location)
-        :task (bring_three_items ?i1 ?u1 ?i2 ?u2 ?i3 ?u3)
-        :precondition ()
-        :subtasks ()
+
+    (:method m_get_carrier_to_items
+        :parameters (?r - robot_carrier ?from - location ?to - location ?b - box ?i - item ?c - container)
+        :task (get_carrier_to_items ?r ?i)
+        :precondition (and
+            (at ?r ?from) (at ?c ?from) (carrying_container ?r ?c)
+            (at ?b ?to) (at ?i ?to) 
+        )
+        :subtasks (and
+            (move_busy_carry ?r ?from ?to)
+        )
     )
 
+
+
     (:method m_bring_item
-        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?from - location ?to - location)
+        :parameters (?r - robot_carrier ?c - container ?u - unit ?i - item ?from - location ?to - location ?iloc - location)
         :task (bring_item ?i ?u)
         :precondition (and
             (carrier_free ?r) (container_free ?c)
-            (at ?r ?from) (at ?i ?from) (at ?c ?from) (at ?u ?to)
+            (need_item ?u ?i) (not (has_item ?u ?i))
+            (at ?r ?from) (at ?c ?from) (at ?u ?to) (at ?i ?iloc)
         )
         :subtasks (and
-            (task0 (prepare_container ?r ?from ?c))
-            (task1 (get_container ?r ?from ?c))
-            (task2 (move_busy_carry ?r ?from ?to))
-            (task3 (deploy_container ?r ?c ?to))
-            (task4 (deploy_boxes_until_needed ?r ?c ?u ?i ?to))
+            (task0 (pickup_container ?r ?c ?from))
+            (task1 (move_busy_carry ?r ?from ?iloc))
+            (task2 (deploy_container ?r ?c ?iloc))
+            (task3 (prepare_container ?r ?iloc ?c))
+            (task4 (get_container ?r ?iloc ?c))
+            (task5 (move_busy_carry ?r ?iloc ?to))
+            (task6 (deploy_container ?r ?c ?to))
+            (task7 (deploy_boxes_until_needed ?r ?c ?u ?i ?to))
         )
         :ordering (and
             (task0 < task1)
             (task1 < task2)
             (task2 < task3)
             (task3 < task4)
+            (task4 < task5)
+            (task5 < task6)
+            (task6 < task7)
         )
     )
 
     (:method m_move_busy_connected_carrier
         :parameters (?r - robot_carrier ?from - location ?to - location ?b - box ?c - container)
         :task (move_busy_carry ?r ?from ?to)
-        :precondition (are_connected ?from ?to)
+        :precondition (and
+            (are_connected ?from ?to) (not (container_empty ?c)) (carrying_container ?r ?c)
+        )
         :subtasks (and
             (move_busy_carrier ?r ?from ?to ?b ?c)
+        )
+    )
+
+    (:method m_move_busy_connected_carrier_empty
+        :parameters (?r - robot_carrier ?from - location ?to - location ?c - container)
+        :task (move_busy_carry ?r ?from ?to)
+        :precondition (and
+            (are_connected ?from ?to) (container_empty ?c) (carrying_container ?r ?c)
+            )
+        :subtasks (and
+            (move_busy_carrier_empty ?r ?from ?to ?c)
         )
     )
 
@@ -238,6 +262,7 @@
             (are_connected ?from ?step)
             (not (= ?step ?to))
             (not (= ?from ?to))
+            (not (container_empty ?c)) (carrying_container ?r ?c)
         )
         :subtasks (and
             (task0 (move_busy_carrier ?r ?from ?step ?b ?c))
@@ -246,6 +271,33 @@
         :ordering (and
             (task0 < task1)
         )
+    )
+
+    (:method m_move_busy_not_connected_carrier_empty
+        :parameters (?r - robot_carrier ?from - location ?to - location ?step - location ?c - container) 
+        :task (move_busy_carry ?r ?from ?to)
+        :precondition (and
+            (are_connected ?from ?step)
+            (not (= ?step ?to))
+            (not (= ?from ?to))
+            (container_empty ?c) (carrying_container ?r ?c)
+        )
+        :subtasks (and
+            (task0 (move_busy_carrier_empty ?r ?from ?to ?c))
+            (task1 (move_busy_carry ?r ?step ?to))
+        )
+        :ordering (and
+            (task0 < task1)
+        )
+    )
+
+    (:method m_move_busy_same_loc
+        :parameters (?r - robot_carrier ?from - location ?to - location ?c - container)
+        :task (move_busy_carry ?r ?from ?to)
+        :precondition (and
+            (= ?from ?to) (at ?r ?from) (at ?c ?from)
+        )
+        :subtasks ()
     )
 
     (:method m_get_container_same_location
@@ -760,6 +812,28 @@
         )
     )
 
+    (:action move_busy_carrier_empty
+        :parameters (?r - robot_carrier ?from - location ?to - location ?c - container)
+        :precondition (and
+            ; check that the two locations are connected
+            (are_connected ?from ?to)
+
+            ; check that the box is on the container
+            ; check that the robot is carrying the container
+            (carrying_container ?r ?c) (container_empty ?c);(not (carrier_free ?r)) (not (container_free ?c))
+
+            ; check that the robot, container and box are at starting location
+            (at ?r ?from) (at ?c ?from)
+        )
+        :effect (and 
+            ; make the robot not be at starting location and make it be at ending location
+            (not (at ?r ?from)) (at ?r ?to)
+            
+            ; make the container not be at starting location and make it be at ending location
+            (not (at ?c ?from)) (at ?c ?to)
+        )
+    )
+
 
     ; ; opposite of pickup
     ; ; make a busy robot deploy a container at a location
@@ -968,58 +1042,5 @@
             (not (escorting ?r ?p)) (escorter_free ?r) (has_reached ?p ?u) (patient_free ?p) (not (needs_escorting ?p)) (not (needs_to_reach ?p ?u))
         )
     )
-
-    ; should not exist
-    ; (:task move_free_carry
-    ;     :parameters (?r - robot_carrier ?from - location ?to - location)
-    ;     :precondition (carrier_free ?r)
-    ;     :effect ()
-    ; )
-
-    ; should never be used
-    ; (:method m_move_free_connected_carrier
-    ;     :parameters (?r - robot_carrier ?from - location ?to - location)
-    ;     :task (move_free_carry ?r ?from ?to)
-    ;     :precondition (are_connected ?from ?to)
-    ;     :subtasks (and
-    ;         (move_free_carrier ?r ?from ?to)
-    ;     )
-    ; )
-
-    ; should never be used
-    ; (:method m_move_free_not_connected_carrier
-    ;     :parameters (?r - robot_carrier ?from - location ?to - location ?step - location) 
-    ;     :task (move_free_carry ?r ?from ?to)
-    ;     :precondition (and
-    ;         (are_connected ?from ?step)
-    ;         (not (= ?step ?to))
-    ;         (not (= ?from ?to))
-    ;     )
-    ;     :subtasks (and
-    ;         (task0 (move_free_carrier ?r ?from ?step))
-    ;         (task1 (move_free_carry ?r ?step ?to))
-    ;     )
-    ;     :ordering (and
-    ;         (task0 < task1)
-    ;     )
-    ; )
-
-    ; should never be used
-    ; (:method m_get_container_different_location
-    ;     :parameters (?r - robot_carrier ?c - container ?from - location ?to - location)
-    ;     :task (get_container ?r ?from ?c)
-    ;     :precondition (and
-    ;         (carrier_free ?r) (container_free ?c)
-    ;         (at ?r ?from) (at ?c ?to)
-    ;         (not (= ?from ?to))
-    ;     )
-    ;     :subtasks (and
-    ;         (task0 (move_free_carry ?r ?from ?to))
-    ;         (task1 (pickup_container ?r ?c ?to))
-    ;     )
-    ;     :ordering (and
-    ;         (task0 < task1)
-    ;     )
-    ; )
 
 )
