@@ -62,14 +62,16 @@
 
     (:htn
         :tasks (and
-            (escort_patient patient1 emergency_trauma)
+            (task0 (escort_patient patient1 emergency_trauma))
             ;(escort_patient patient2 intensive_cardiac)
-            ;(insert_box_1 carrier1 box1 container1 central_warehouse)
-            ;(insert_box_2 carrier1 box2 container1 central_warehouse)
-            ;(insert_box_3 carrier1 box3 container1 central_warehouse)
-            ;(pickup_container carrier1 container1 central_warehouse)
-            ;(get_carrier_to_items carrier1 ventilator1 central_warehouse medical_department container1)
-            (deliver_one_item carrier1 ventilator1 intensive_surgical intensive_care_department container1)
+            (task1 (deliver_one_item carrier1 ventilator1 intensive_surgical intensive_care_department container1))
+            (task2 (deliver_one_item carrier2 oxygen2 emergency_pediatric emergency_department container2))
+            (task3 (escort_patient patient2 intensive_cardiac))
+        )
+        :ordering (and
+            (task0 < task1)
+            (task1 < task2)
+            (task2 < task3)
         )
     )
 
