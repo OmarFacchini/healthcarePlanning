@@ -139,12 +139,17 @@
         :effect ()
     )
 
+    (:task deliver_two_items
+        :parameters (?r - robot_carrier ?i1 - item ?i2 - item ?u1 - unit ?u2 - unit ?uloc1 - location ?uloc2 - location ?c - container)
+        :precondition ()
+        :effect ()
+    )
+
     (:task get_carrier_to_items
         :parameters (?r - robot_carrier ?i - item ?rloc - location ?iloc - location ?c - container)
         :precondition ()
         :effect ()
     )
-
 
     (:task move_busy_carry
         :parameters (?r - robot_carrier ?c - container ?from - location ?to - location)
@@ -158,6 +163,15 @@
         :parameters (?r - robot_carrier ?i - item ?loc - location ?c - container ?b - box ?u - unit)
         :precondition (and
             (box_free ?b) (carrier_free ?r) (container_free ?c) (container_empty ?c)
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :effect ()
+    )
+
+    (:task load_box_two
+        :parameters (?r - robot_carrier ?i - item ?loc - location ?c - container ?b - box ?u - unit)
+        :precondition (and
+            (box_free ?b) (carrier_free ?r) (container_free ?c) (container_one_box ?c)
             (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
         )
         :effect ()
@@ -180,6 +194,17 @@
         :effect ()
     )
 
+    (:task deploy_box_two
+        :parameters (?r - robot_carrier ?c - container ?b - box ?loc - location)
+        :precondition (and
+            (on ?b ?c) (carrier_free ?r) (container_free ?c) (container_two_boxes ?c)
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :effect ()
+    )
+
+
+
     (:method m_deploy_box_one
         :parameters (?r - robot_carrier ?c - container ?b - box ?loc - location)
         :task (deploy_box_one ?r ?c ?b ?loc)
@@ -189,6 +214,18 @@
         )
         :subtasks (and
             (deploy_box_1 ?r ?c ?b ?loc)
+        )
+    )
+
+    (:method m_deploy_box_two
+        :parameters (?r - robot_carrier ?c - container ?b - box ?loc - location)
+        :task (deploy_box_two ?r ?c ?b ?loc)
+        :precondition (and
+            (on ?b ?c) (carrier_free ?r) (container_free ?c) (container_two_boxes ?c)
+            (at ?r ?loc) (at ?c ?loc) (at ?b ?loc)
+        )
+        :subtasks (and
+            (deploy_box_2 ?r ?c ?b ?loc)
         )
     )
 
@@ -231,6 +268,23 @@
         )
     )
 
+    (:method m_load_box_two
+        :parameters (?r - robot_carrier ?i - item ?loc - location ?c - container ?b - box ?u - unit)
+        :task (load_box_two ?r ?i ?loc ?c ?b ?u)
+        :precondition (and
+            (box_free ?b) (carrier_free ?r) (container_free ?c) (container_one_box ?c)
+            (is_empty ?b) (need_item ?u ?i) (not (has_item ?u ?i))
+            (at ?r ?loc) (at ?i ?loc) (at ?c ?loc) (at ?b ?loc) (not (at ?u ?loc))
+        )
+        :subtasks (and
+            (task0 (insert_item ?r ?b ?i ?loc))
+            (task1 (insert_box_2 ?r ?b ?c ?loc))
+        )
+        :ordering (and
+            (task0 < task1)
+        )
+    )
+
     (:method m_load_empty_box_one
         :parameters (?r - robot_carrier ?i - item ?loc - location ?c - container ?b - box ?u - unit)
         :task (load_box_one ?r ?i ?loc ?c ?b ?u)
@@ -241,6 +295,19 @@
         )
         :subtasks (and
             (task0 (insert_box_1 ?r ?b ?c ?loc))
+        )
+    )
+
+    (:method m_load_empty_box_two
+        :parameters (?r - robot_carrier ?i - item ?loc - location ?c - container ?b - box ?u - unit)
+        :task (load_box_two ?r ?i ?loc ?c ?b ?u)
+        :precondition (and
+            (box_free ?b) (carrier_free ?r) (container_free ?c) (container_one_box ?c)
+            (is_empty ?b) (not (need_item ?u ?i)) (has_item ?u ?i)
+            (at ?r ?loc) (at ?i ?loc) (at ?c ?loc) (at ?b ?loc) (at ?u ?loc)
+        )
+        :subtasks (and
+            (task0 (insert_box_2 ?r ?b ?c ?loc))
         )
     )
 
@@ -375,7 +442,6 @@
         )
     )
 
-
     (:method m_get_carrier_to_items_same_location
         :parameters (?r - robot_carrier ?i - item ?rloc - location ?iloc - location ?c - container)
         :task (get_carrier_to_items ?r ?i ?rloc ?iloc ?c)
@@ -424,6 +490,65 @@
             (task5 < task6)
             (task6 < task7)
             (task7 < task8)
+        )
+    )
+
+    (:method m_deliver_two_items
+        :parameters (?r - robot_carrier ?i1 - item ?i2 - item ?u1 - unit ?u2 - unit ?uloc1 - location ?uloc2 - location
+                     ?iloc1 - location ?iloc2 - location ?rloc - location ?c - container ?b1 - box ?b2 - box)
+        :task (deliver_two_items ?r ?i1 ?i2 ?u1 ?u2 ?uloc1 ?uloc2 ?c)
+        :precondition (and
+            (at ?r ?rloc) (at ?c ?rloc)
+            (at ?u1 ?uloc1) (need_item ?u1 ?i1) (not (has_item ?u1 ?i1)) (at ?i1 ?iloc1) (at ?b1 ?iloc1)
+            (at ?u2 ?uloc2) (need_item ?u2 ?i2) (not (has_item ?u2 ?i2)) (at ?i2 ?iloc2) (at ?b2 ?iloc2)
+            (not (= ?b1 ?b2))
+        )
+        :subtasks (and
+            ; pick container up
+            (task0 (pickup_container ?r ?c ?rloc))
+            ;move carrier and container to first item, load the box(and the item) and pick up container again
+            (task1 (get_carrier_to_items ?r ?i1 ?rloc ?iloc1 ?c))
+            (task2 (deploy_container ?r ?c ?iloc1))
+            (task3 (load_box_one ?r ?i1 ?iloc1 ?c ?b1 ?u1))
+            (task4 (pickup_container ?r ?c ?iloc1))
+
+            ; repeat for item 2 at location 2 (so this works even with items at different locations as long as there is one box there)
+            (task5 (get_carrier_to_items ?r ?i2 ?iloc1 ?iloc2 ?c))
+            (task6 (deploy_container ?r ?c ?iloc2))
+            (task7 (load_box_two ?r ?i2 ?iloc2 ?c ?b2 ?u2))
+            (task8 (pickup_container ?r ?c ?iloc2))
+
+            ; move carrier to second unit and deliver the item
+            (task9 (get_carrier_to_unit ?r ?u2 ?iloc2 ?uloc2 ?c))
+            (task10 (deploy_container ?r ?c ?uloc2))
+            (task11 (deploy_box_two ?r ?c ?b2 ?uloc2))
+            (task12 (deliver_item ?r ?b2 ?uloc2 ?i2 ?u2))
+
+            ; repeat for second item and unit
+            (task13 (pickup_container ?r ?c ?uloc2))
+            (task14 (get_carrier_to_unit ?r ?u1 ?uloc2 ?uloc1 ?c))
+            (task15 (deploy_container ?r ?c ?uloc1))
+            (task16 (deploy_box_one ?r ?c ?b1 ?uloc1))
+            (task17 (deliver_item ?r ?b1 ?uloc1 ?i1 ?u1))
+        )
+        :ordering (and
+            (task0 < task1)
+            (task1 < task2)
+            (task2 < task3)
+            (task3 < task4)
+            (task4 < task5)
+            (task5 < task6)
+            (task6 < task7)
+            (task7 < task8)
+            (task8 < task9)
+            (task9 < task10)
+            (task10 < task11)
+            (task11 < task12)
+            (task12 < task13)
+            (task13 < task14)
+            (task14 < task15)
+            (task15 < task16)
+            (task16 < task17)
         )
     )
 
