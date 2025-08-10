@@ -175,7 +175,7 @@
         (at oxygen1 central_warehouse)
         (at oxygen2 central_warehouse)
 
-        (at ventilator1 medical_department)
+        (at ventilator1 central_warehouse)
         (at ventilator2 central_warehouse)
         (at feeding_pump1 central_warehouse)
         (at feeding_pump2 central_warehouse)
