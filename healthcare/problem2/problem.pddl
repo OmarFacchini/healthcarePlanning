@@ -1,5 +1,5 @@
 (define (problem problem2_general)
-    (:domain healthcare-problem2_general)
+    (:domain problem2)
 
     (:objects
 
@@ -135,9 +135,7 @@
         (at box5 central_warehouse)
         (at box6 central_warehouse)
         (at box7 central_warehouse)
-        ;(at box8 central_warehouse)
-        ;(at box9 central_warehouse)
-        ;(at box10 central_warehouse)
+
 
         ; specify that the boxes are empty (otherwise no item will be inserted in them)
         (is_empty box1)
@@ -147,9 +145,6 @@
         (is_empty box5)
         (is_empty box6)
         (is_empty box7)
-        ;(is_empty box8)
-        ;(is_empty box9)
-        ;(is_empty box10)
 
         ; and free
         (box_free box1)
@@ -159,9 +154,6 @@
         (box_free box5)
         (box_free box6)
         (box_free box7)
-        ;(box_free box8)
-        ;(box_free box9)
-        ;(box_free box10)
 
         ; start simple with all items in the warehouse too (defined in initial condition of the problem)
         ; this emulates a clean start of the day
@@ -218,10 +210,8 @@
 
         ; container initially is at central_warehouse
         (at container1 central_warehouse)
-        (container_empty container1)
 
         (at container2 central_warehouse)
-        (container_empty container2)
 
         ; set container to be free
         (container_free container1)

@@ -1,18 +1,13 @@
-# Here will be explained the usage
+# Problem2
 
-This works, but is very VERY bad and takes hours for this simple task, therefore while it's an option I highly suggest ***avoiding*** it
+This is an extension of problem1 in which we add a container to the carriers allowing them to move more than 1 box at a time up to a defined limit.
 
+To run the problem use the command:
 ```
-enhsp -o domain.pddl -f problem.pddl > filename
-```
-
-Currently the best planner and the related command to use is:
-
-```
-metric-ff domain.pddl problem.pddl  > filename
+metric-ff domain.pddl problem.pddl > actions
 ```
 
 which will generate two files:
 
-1. `filename` which contains the full output of the planner with extra informations (eg. time spent)
-2. `problem.pddl.plan` which contains only the plan
+1. `actions` which contains the full output of the planner with extra informations (eg. time spent) as well as the plan
+2. `problem.pddl.plan` which contains only the clean plan

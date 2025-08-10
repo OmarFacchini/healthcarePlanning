@@ -1,6 +1,6 @@
 
 ff: parsing domain file
-domain 'HEALTHCARE-PROBLEM2_GENERAL' defined
+domain 'PROBLEM2' defined
  ... done.
 ff: parsing problem file
 problem 'PROBLEM2_GENERAL' defined
@@ -198,6 +198,6 @@ time spent:    0.00 seconds instantiating 24302 easy, 0 hard action templates
                0.00 seconds creating final representation with 422 relevant facts, 5 relevant fluents
                0.00 seconds computing LNF
                0.00 seconds building connectivity graph
-             119.46 seconds searching, evaluating 281959 states, to a max depth of 7
-             119.46 seconds total time
+             117.87 seconds searching, evaluating 281959 states, to a max depth of 7
+             117.87 seconds total time
 

@@ -1,4 +1,4 @@
-(define (domain healthcare-problem2_general)
+(define (domain problem2)
     (:requirements :strips :typing :adl :fluents :action-costs)
     (:types
         ; location we use to indicate position of robots/medical units
