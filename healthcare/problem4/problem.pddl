@@ -14,7 +14,7 @@
 
         ; no definition of number of boxes, start simple with just 2
         box1 box2 - box
-        box3 box4 box5 box6 box7 - box
+        box3 box4 box5 box6 - box
 
         ; no definition on number of items, just indirectly stated there can be many of the same item (5 scalpels)
         ; used in emergency_department
@@ -125,36 +125,33 @@
         (carrier_free carrier1)
         (carrier_free_for_action carrier1)
 
-        ;(at carrier2 central_warehouse)
-        ;(carrier_free carrier2)
-        ;(carrier_free_for_action carrier2)
+        (at carrier2 central_warehouse)
+        (carrier_free carrier2)
+        (carrier_free_for_action carrier2)
 
         (at box1 central_warehouse) 
-        ;(at box2 central_warehouse)
+        (at box2 central_warehouse)
         ;(at box3 central_warehouse)
         ;(at box4 central_warehouse)
         ;(at box5 central_warehouse)
         ;(at box6 central_warehouse)
-        ;(at box7 central_warehouse)
 
 
         ; specify that the boxes are empty (otherwise no item will be inserted in them)
         (is_empty box1)
-        ;(is_empty box2)
+        (is_empty box2)
         ;(is_empty box3)
         ;(is_empty box4)
         ;(is_empty box5)
         ;(is_empty box6)
-        ;(is_empty box7)
 
         ; and free
         (box_free box1)
-        ;(box_free box2)
+        (box_free box2)
         ;(box_free box3)
         ;(box_free box4)
         ;(box_free box5)
         ;(box_free box6)
-        ;(box_free box7)
 
         ; start simple with all items in the warehouse too (defined in initial condition of the problem)
         ; this emulates a clean start of the day
@@ -192,7 +189,7 @@
         (need_item emergency_trauma defibrillator1)
         (need_item emergency_trauma defibrillator2)
         (need_item emergency_psychiatric oxygen1)
-        (need_item emergency_pediatric oxygen2)
+        ;(need_item emergency_pediatric oxygen2)
 
         ; generale simple case
         ;(need_item intensive_surgical ventilator1)
@@ -212,52 +209,42 @@
         ; container initially is at central_warehouse
         (at container1 central_warehouse)
 
-        ;(at container2 central_warehouse)
+        (at container2 central_warehouse)
 
         ; set container to be free
         (container_free container1)
-        ;(container_free container2)
+        (container_free container2)
 
         ; simple case where the container can take 1 box at a time (this simulates the robot carrying 1 box at the moment)
         ; done to verify the load checking constraints
         (= (container_capacity container1) 2)
-        ;(= (container_capacity container2) 3)
+        (= (container_capacity container2) 3)
 
         ; initial load of container is zero(emprty)
         (= (container_load container1) 0)
-        ;(= (container_load container2) 0)
+        (= (container_load container2) 0)
 
     )
 
     (:goal 
         (and 
-            ;(inside scalpel1 box1)
-            ;(escorting escorter1 patient1)
-            ;(at escorter1 hallway)
-
             ; check that patients reached the needed unit
             (has_reached patient1 emergency_trauma)
             (has_reached patient2 intensive_cardiac)
 
             ; make sure the patients was also let go from the escorter
-            ;(patient_free patient1)
-            ;(patient_free patient2)
+            (patient_free patient1)
+            (patient_free patient2)
 
             ; also make sure the escorter is free as there are no more patients to escort
             (escorter_free escorter1)
 
-            ; check for any item of that type that is required by the uni
-            ; this allows eg: emergency_trauma unit, which needs a defibrillator, to accept 
-            ; either defibrillator1 or defibrillator2
-            ;(exists (?d - defibrillator) (has_item emergency_trauma ?d))
-            ;(exists (?ox - oxygen) (has_item emergency_psychiatric ?ox))
-            ;(exists (?ox - oxygen) (has_item emergency_pediatric ?ox))
-            ;(exists (?v - ventilator) (has_item intensive_surgical ?v))
-            ;(exists (?fp - feeding_pump) (has_item intensive_cardiac ?fp))
-            ;(exists (?v - ventilator) (has_item intensive_pediatric ?v))
-            ;(exists (?ip - IV_pump) (has_item progressive_surgical ?ip))
-            ;(exists (?ip - IV_pump) (has_item progressive_cardiac ?ip))
-            ;(exists (?ec - ECG_machine) (has_item progressive_pediatric ?ec))
+            ; sadly can't keep generalization of item due to popf not supporting the exists
+            ; and the optic planner not supporting the numerics
+            (has_item emergency_trauma defibrillator1)
+            (has_item emergency_psychiatric oxygen1)
+            ;(has_item intensive_cardiac feeding_pump1)
+            ;(has_item progressive_surgical IV_pump1)
 
       )
     )

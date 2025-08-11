@@ -1,22 +1,39 @@
-Number of literals: 56
-Constructing lookup tables: [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%]
-Post filtering unreachable actions:  [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%]
-[01;34mNo analytic limits found, not considering limit effects of goal-only operators[00m
-None of the ground temporal actions in this problem have been recognised as compression-safe
-Initial heuristic = 22.000
-b (21.000 | 3.000)
-Resorting to best-first search
-b (17.000 | 2.000)b (16.000 | 2.000)b (15.000 | 6.001)b (14.000 | 12.003)b (13.000 | 15.004)b (12.000 | 15.004)b (11.000 | 18.005)b (7.000 | 20.006)b (6.000 | 20.006)b (5.000 | 24.007)b (4.000 | 24.007)b (3.000 | 28.008)b (2.000 | 28.008)b (1.000 | 30.009);;;; Solution Found
-; States evaluated: 73
-; Cost: 30.009
-; Time 0.09
+; Cost: 28.016
+; Time 220.36
 0.000: (get_patient escorter1 patient1 entrance)  [2.000]
-2.001: (move_escorting_accompanier escorter1 entrance hallway patient1)  [4.000]
-6.002: (move_escorting_accompanier escorter1 hallway emergency_department patient1)  [4.000]
-10.003: (drop_off_patient escorter1 patient1 emergency_department emergency_trauma)  [2.000]
-12.004: (move_free_accompanier escorter1 emergency_department hallway)  [3.000]
-15.005: (move_free_accompanier escorter1 hallway entrance)  [3.000]
+0.000: (insert_box carrier1 box1 container1 central_warehouse)  [2.000]
+2.001: (move_escorting_accompanier escorter1 entrance hallway patient1)  [3.000]
+2.001: (pickup_container carrier1 container2 central_warehouse)  [1.000]
+3.002: (deploy_container carrier1 container2 central_warehouse)  [1.000]
+3.004: (deploy_box carrier2 container1 box1 central_warehouse)  [1.000]
+4.003: (deploy_box carrier1 container1 box1 central_warehouse)  [1.000]
+4.005: (insert_item carrier2 box1 oxygen1 central_warehouse)  [2.000]
+5.002: (move_escorting_accompanier escorter1 hallway emergency_department patient1)  [3.000]
+5.004: (insert_box carrier1 box1 container1 central_warehouse)  [2.000]
+7.005: (insert_item carrier1 box2 defibrillator1 central_warehouse)  [2.000]
+7.005: (pickup_container carrier2 container1 central_warehouse)  [1.000]
+8.003: (drop_off_patient escorter1 patient1 emergency_department emergency_trauma)  [2.000]
+8.006: (move_busy_carrier carrier2 central_warehouse hallway box1 container1)  [4.000]
+9.006: (insert_box carrier1 box2 container2 central_warehouse)  [2.000]
+10.004: (move_free_accompanier escorter1 emergency_department hallway)  [4.000]
+11.007: (pickup_container carrier1 container2 central_warehouse)  [1.000]
+12.007: (deploy_container carrier2 container1 hallway)  [1.000]
+12.008: (move_busy_carrier carrier1 central_warehouse hallway box2 container2)  [4.000]
+14.005: (move_free_accompanier escorter1 hallway entrance)  [4.000]
+16.009: (deploy_container carrier1 container2 hallway)  [1.000]
+17.010: (deploy_box carrier2 container2 box2 hallway)  [1.000]
 18.006: (get_patient escorter1 patient2 entrance)  [2.000]
-20.007: (move_escorting_accompanier escorter1 entrance hallway patient2)  [4.000]
-24.008: (move_escorting_accompanier escorter1 hallway intensive_care_department patient2)  [4.000]
-28.009: (drop_off_patient escorter1 patient2 intensive_care_department intensive_cardiac)  [2.000]
+18.011: (insert_box carrier2 box2 container2 hallway)  [2.000]
+19.011: (pickup_container carrier1 container1 hallway)  [1.000]
+20.007: (move_escorting_accompanier escorter1 entrance hallway patient2)  [3.000]
+20.012: (move_busy_carrier carrier1 hallway emergency_department box1 container1)  [4.000]
+20.012: (pickup_container carrier2 container2 hallway)  [1.000]
+21.013: (move_busy_carrier carrier2 hallway emergency_department box2 container2)  [4.000]
+23.008: (move_escorting_accompanier escorter1 hallway intensive_care_department patient2)  [3.000]
+24.013: (deploy_container carrier1 container1 emergency_department)  [1.000]
+25.014: (deliver_item carrier1 box1 emergency_department oxygen1 emergency_psychiatric)  [1.000]
+25.014: (deploy_container carrier2 container2 emergency_department)  [1.000]
+26.009: (drop_off_patient escorter1 patient2 intensive_care_department intensive_cardiac)  [2.000]
+26.015: (pickup_container carrier2 container1 emergency_department)  [1.000]
+26.015: (deploy_box carrier1 container2 box2 emergency_department)  [1.000]
+27.016: (deliver_item carrier1 box2 emergency_department defibrillator1 emergency_trauma)  [1.000]
