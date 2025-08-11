@@ -1,0 +1,22 @@
+Number of literals: 56
+Constructing lookup tables: [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%]
+Post filtering unreachable actions:  [10%] [20%] [30%] [40%] [50%] [60%] [70%] [80%] [90%] [100%]
+[01;34mNo analytic limits found, not considering limit effects of goal-only operators[00m
+None of the ground temporal actions in this problem have been recognised as compression-safe
+Initial heuristic = 22.000
+b (21.000 | 3.000)
+Resorting to best-first search
+b (17.000 | 2.000)b (16.000 | 2.000)b (15.000 | 6.001)b (14.000 | 12.003)b (13.000 | 15.004)b (12.000 | 15.004)b (11.000 | 18.005)b (7.000 | 20.006)b (6.000 | 20.006)b (5.000 | 24.007)b (4.000 | 24.007)b (3.000 | 28.008)b (2.000 | 28.008)b (1.000 | 30.009);;;; Solution Found
+; States evaluated: 73
+; Cost: 30.009
+; Time 0.09
+0.000: (get_patient escorter1 patient1 entrance)  [2.000]
+2.001: (move_escorting_accompanier escorter1 entrance hallway patient1)  [4.000]
+6.002: (move_escorting_accompanier escorter1 hallway emergency_department patient1)  [4.000]
+10.003: (drop_off_patient escorter1 patient1 emergency_department emergency_trauma)  [2.000]
+12.004: (move_free_accompanier escorter1 emergency_department hallway)  [3.000]
+15.005: (move_free_accompanier escorter1 hallway entrance)  [3.000]
+18.006: (get_patient escorter1 patient2 entrance)  [2.000]
+20.007: (move_escorting_accompanier escorter1 entrance hallway patient2)  [4.000]
+24.008: (move_escorting_accompanier escorter1 hallway intensive_care_department patient2)  [4.000]
+28.009: (drop_off_patient escorter1 patient2 intensive_care_department intensive_cardiac)  [2.000]
