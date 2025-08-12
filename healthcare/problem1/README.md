@@ -5,6 +5,7 @@ Here the task is to have carriers move boxes containing one item around, effecti
 
 Same concept for patients.
 
+## Usage
 To run the problem use the command:
 
 ```

@@ -1,5 +1,5 @@
-; Cost: 0.000
-; Time 237.84
+; Cost: 30.009
+; Time 258.16
 0.000: (get_patient escorter1 patient1 entrance)  [2.000]
 0.000: (pickup_container carrier1 container1 central_warehouse)  [3.000]
 0.000: (insert_item carrier2 box1 oxygen1 central_warehouse)  [1.000]
@@ -11,8 +11,8 @@
 4.003: (pickup_container carrier2 container2 central_warehouse)  [3.000]
 5.002: (move_escorting_accompanier escorter1 hallway emergency_department patient1)  [3.000]
 5.003: (insert_box carrier1 box2 container1 central_warehouse)  [2.000]
-7.004: (deploy_container carrier2 container2 central_warehouse)  [1.000]
 7.004: (pickup_container carrier1 container1 central_warehouse)  [3.000]
+7.004: (deploy_container carrier2 container2 central_warehouse)  [1.000]
 8.003: (drop_off_patient escorter1 patient1 emergency_department emergency_trauma)  [2.000]
 8.005: (insert_box carrier2 box1 container2 central_warehouse)  [2.000]
 10.004: (move_free_accompanier escorter1 emergency_department hallway)  [5.000]
@@ -27,9 +27,8 @@
 20.006: (get_patient escorter1 patient2 entrance)  [2.000]
 20.009: (deliver_item carrier1 box2 emergency_department defibrillator1 emergency_trauma)  [1.000]
 21.009: (deploy_container carrier2 container2 emergency_department)  [1.000]
-21.010: (pickup_container carrier1 container1 emergency_department)  [3.000]
 22.007: (move_escorting_accompanier escorter1 entrance hallway patient2)  [3.000]
-22.010: (deploy_box carrier2 container2 box1 emergency_department)  [1.000]
-23.011: (deliver_item carrier2 box1 emergency_department oxygen1 emergency_psychiatric)  [1.000]
+22.010: (deploy_box carrier1 container2 box1 emergency_department)  [1.000]
+23.011: (deliver_item carrier1 box1 emergency_department oxygen1 emergency_psychiatric)  [1.000]
 25.008: (move_escorting_accompanier escorter1 hallway intensive_care_department patient2)  [3.000]
 28.009: (drop_off_patient escorter1 patient2 intensive_care_department intensive_cardiac)  [2.000]

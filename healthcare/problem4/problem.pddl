@@ -14,7 +14,6 @@
 
         ; no definition of number of boxes, start simple with just 2
         box1 box2 - box
-        box3 box4 box5 box6 - box
 
         ; no definition on number of items, just indirectly stated there can be many of the same item (5 scalpels)
         ; used in emergency_department
@@ -86,19 +85,16 @@
         ; assign each unit to a department, only 
         (at emergency_trauma emergency_department)
         (at emergency_psychiatric emergency_department)
-        ;(at emergency_pediatric emergency_department)
 
-        ;(at intensive_surgical intensive_care_department)
+
         (at intensive_cardiac intensive_care_department)
-        ;(at intensive_pediatric intensive_care_department)
+
         
         (at progressive_surgical progressive_care_department)
-        ;(at progressive_cardiac progressive_care_department)
-        ;(at progressive_pediatric progressive_care_department)
+
         
         (at medical_post_surgical medical_department)
-        ;(at medical_orthopedics medical_department)
-        ;(at medical_oncology medical_department)
+
 
 
         ; escorter and patient start at the entrance
@@ -131,27 +127,15 @@
 
         (at box1 central_warehouse) 
         (at box2 central_warehouse)
-        ;(at box3 central_warehouse)
-        ;(at box4 central_warehouse)
-        ;(at box5 central_warehouse)
-        ;(at box6 central_warehouse)
 
 
         ; specify that the boxes are empty (otherwise no item will be inserted in them)
         (is_empty box1)
         (is_empty box2)
-        ;(is_empty box3)
-        ;(is_empty box4)
-        ;(is_empty box5)
-        ;(is_empty box6)
 
         ; and free
         (box_free box1)
         (box_free box2)
-        ;(box_free box3)
-        ;(box_free box4)
-        ;(box_free box5)
-        ;(box_free box6)
 
         ; start simple with all items in the warehouse too (defined in initial condition of the problem)
         ; this emulates a clean start of the day
@@ -189,17 +173,12 @@
         (need_item emergency_trauma defibrillator1)
         (need_item emergency_trauma defibrillator2)
         (need_item emergency_psychiatric oxygen1)
-        ;(need_item emergency_pediatric oxygen2)
 
         ; generale simple case
-        ;(need_item intensive_surgical ventilator1)
         (need_item intensive_cardiac feeding_pump1)
-        ;(need_item intensive_pediatric ventilator2)
 
         ; another simple case
         (need_item progressive_surgical IV_pump1)
-        ;(need_item progressive_cardiac IV_pump2)
-        ;(need_item progressive_pediatric ECG_machine1)
 
 
         ; assume no units of medical_department need any item, as per part of the goal defined by the problem
@@ -243,10 +222,11 @@
             ; and the optic planner not supporting the numerics
             (has_item emergency_trauma defibrillator1)
             (has_item emergency_psychiatric oxygen1)
-            ;(has_item intensive_cardiac feeding_pump1)
-            ;(has_item progressive_surgical IV_pump1)
+            (has_item intensive_cardiac feeding_pump1)
+            (need_item progressive_surgical IV_pump1)
 
       )
     )
     (:metric minimize (total-time))
+    ;(:metric minimize (makespan))
 )

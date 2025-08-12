@@ -202,7 +202,7 @@
 
     (:durative-action move_free_accompanier
         :parameters (?r - robot_accompany ?from - location ?to - location)
-        :duration (= ?duration 4)
+        :duration (= ?duration 5)
         :condition (and 
             (at start (escorter_free ?r))
             (at start (escorter_free_for_action ?r))
@@ -225,7 +225,7 @@
 
     (:durative-action insert_item
         :parameters (?r - robot_carrier ?b - box ?i - item ?loc - location)
-        :duration (= ?duration 2)
+        :duration (= ?duration 1)
         :condition (and 
             (at start (is_empty ?b))
             (at start (carrier_free ?r))
@@ -288,7 +288,7 @@
     
     (:durative-action pickup_container
         :parameters (?r - robot_carrier ?c - container ?loc - location)
-        :duration (= ?duration 1)
+        :duration (= ?duration 3)
         :condition (and 
             (at start (carrier_free_for_action ?r))
             (at start (carrier_free ?r))
@@ -397,7 +397,6 @@
         :condition (and 
             (at start (carrier_free_for_action ?r))
             (at start (carrier_free ?r))
-            ;(at start (box_free ?b))
             (at start (need_item ?u ?i))
             ;(at start (not (has_item ?u ?i)))
             (at start (inside ?i ?b))
@@ -421,28 +420,5 @@
             (at end (is_empty ?b))
         )
     )
-    
-
-    ; ; same as move_busy_carrier but with the robot not holding a box
-    ; (:action move_free_carrier
-    ;     :parameters (?r - robot_carrier ?from - location ?to - location)
-    ;     :precondition (and 
-    ;         ; check that the two locations are connected
-    ;         (are_connected ?from ?to)
-
-    ;         ; since we have a function that moves the robot holding a box, we make sure for this one the robot does not hold a box
-    ;         (carrier_free ?r)
-
-    ;         ; check that the robot is at starting location
-    ;         (at ?r ?from)
-    ;     )
-    ;     :effect (and 
-    ;         ; make the robot not be at starting location and make it be at ending location
-    ;         (not (at ?r ?from)) (at ?r ?to)
-
-    ;         (increase (total_cost) 1)
-    ;     )
-    ; )
-
 
 )
