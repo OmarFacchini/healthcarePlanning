@@ -1,5 +1,5 @@
 (define (domain problem4)
-    (:requirements :strips :typing :adl :fluents :action-costs :durative-actions)
+    (:requirements :strips :typing :adl :fluents :durative-actions)
     (:types
         ; location we use to indicate position of robots/medical units
         ; patient: atients that need to be accompanied (by robots) to a medical unit

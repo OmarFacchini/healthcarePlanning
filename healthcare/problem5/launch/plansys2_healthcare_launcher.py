@@ -22,10 +22,9 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-
 def generate_launch_description():
     # Get the launch directory
-    example_dir = get_package_share_directory('plansys2_simple_example')
+    example_dir = get_package_share_directory('problem5')
     namespace = LaunchConfiguration('namespace')
 
     declare_namespace_cmd = DeclareLaunchArgument(
@@ -39,34 +38,103 @@ def generate_launch_description():
             'launch',
             'plansys2_bringup_launch_monolithic.py')),
         launch_arguments={
-          'model_file': example_dir + '/pddl/simple_example.pddl',
-          'namespace': namespace
+          'model_file': example_dir + '/pddl/domain.pddl',
+          'namespace': namespace,
+          'planner_plugin': 'plansys2::TemporalFastDownwardPlanner'
           }.items())
 
     # Specify the actions
-    move_cmd = Node(
-        package='plansys2_simple_example',
-        executable='move_action_node',
-        name='move_action_node',
+    deliver_item_cmd = Node(
+        package='problem5',
+        executable='deliver_item_action_node',
+        name='deliver_item_action_node',
         namespace=namespace,
         output='screen',
         parameters=[])
 
-    charge_cmd = Node(
-        package='plansys2_simple_example',
-        executable='charge_action_node',
-        name='charge_action_node',
+    deploy_box_cmd = Node(
+        package='problem5',
+        executable='deploy_box_action_node',
+        name='deploy_box_action_node',
         namespace=namespace,
         output='screen',
         parameters=[])
 
-    ask_charge_cmd = Node(
-        package='plansys2_simple_example',
-        executable='ask_charge_action_node',
-        name='ask_charge_action_node',
+    deploy_container_cmd = Node(
+        package='problem5',
+        executable='deploy_container_action_node',
+        name='deploy_container_action_node',
         namespace=namespace,
         output='screen',
-        parameters=[])   # Create the launch description and populate
+        parameters=[]) 
+    
+    drop_off_patient_cmd = Node(
+        package='problem5',
+        executable='drop_off_patient_action_node',
+        name='drop_off_patient_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    get_patient_cmd = Node(
+        package='problem5',
+        executable='get_patient_action_node',
+        name='get_patient_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    insert_box_cmd = Node(
+        package='problem5',
+        executable='insert_box_action_node',
+        name='insert_box_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    insert_item_cmd = Node(
+        package='problem5',
+        executable='insert_item_action_node',
+        name='insert_item_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    move_busy_carrier_cmd = Node(
+        package='problem5',
+        executable='move_busy_carrier_action_node',
+        name='move_busy_carrier_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    move_escorting_accompanier_cmd = Node(
+        package='problem5',
+        executable='move_escorting_accompanier_action_node',
+        name='move_escorting_accompanier_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    move_free_accompanier_cmd = Node(
+        package='problem5',
+        executable='move_free_accompanier_action_node',
+        name='move_free_accompanier_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    pickup_container_cmd = Node(
+        package='problem5',
+        executable='pickup_container_action_node',
+        name='pickup_container_action_node',
+        namespace=namespace,
+        output='screen',
+        parameters=[]) 
+    
+    
+
+    # Create the launch description and populate
     ld = LaunchDescription()
 
     ld.add_action(declare_namespace_cmd)
@@ -74,8 +142,16 @@ def generate_launch_description():
     # Declare the launch options
     ld.add_action(plansys2_cmd)
 
-    ld.add_action(move_cmd)
-    ld.add_action(charge_cmd)
-    ld.add_action(ask_charge_cmd)
+    ld.add_action(deliver_item_cmd)
+    ld.add_action(deploy_box_cmd)
+    ld.add_action(deploy_container_cmd)
+    ld.add_action(drop_off_patient_cmd)
+    ld.add_action(get_patient_cmd)
+    ld.add_action(insert_box_cmd)
+    ld.add_action(insert_item_cmd)
+    ld.add_action(move_busy_carrier_cmd)
+    ld.add_action(move_escorting_accompanier_cmd)
+    ld.add_action(move_free_accompanier_cmd)
+    ld.add_action(pickup_container_cmd)
 
     return ld
