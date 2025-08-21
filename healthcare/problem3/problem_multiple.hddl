@@ -62,13 +62,13 @@
 
     (:htn
         :tasks (and
-            ;(task0 (escort_patient patient1 emergency_trauma))
+            (task0 (escort_patient patient1 emergency_trauma))
             (task1 (deliver_two_items carrier1 ventilator1 oxygen2 intensive_surgical emergency_pediatric intensive_care_department
                     emergency_department container1))
             (task2 (escort_patient patient2 intensive_cardiac))
         )
         :ordering (and
-            ;(task0 < task1)
+            (task0 < task1)
             (task1 < task2)
         )
     )

@@ -39,7 +39,7 @@ java -jar PANDA.jar -parser hddl domain_simple.hddl problem_simple.hddl | awk '/
 
 To run the complex (second) one use the command:
 ```
-java -jar PANDA.jar -parser hddl domain_rec.hddl problem_rec.hddl | awk '/SOLUTION SEQUENCE/{flag=1; next} flag' > plan_rec.plan
+java -jar PANDA.jar  -parser hddl domain_simple.hddl problem_multiple.hddl  | awk '/SOLUTION SEQUENCE/{flag=1; next} flag' > plan_multiple.plan
 ```
 
 

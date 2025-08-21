@@ -222,11 +222,10 @@
             ; and the optic planner not supporting the numerics
             (has_item emergency_trauma defibrillator1)
             (has_item emergency_psychiatric oxygen1)
-            (has_item intensive_cardiac feeding_pump1)
-            (need_item progressive_surgical IV_pump1)
+            ;(has_item intensive_cardiac feeding_pump1)
+            ;(need_item progressive_surgical IV_pump1)
 
       )
     )
     (:metric minimize (total-time))
-    ;(:metric minimize (makespan))
 )

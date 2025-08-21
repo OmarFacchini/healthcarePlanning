@@ -7,12 +7,12 @@
         ; unit: medical units to which robots bring boxes(with items)/ patients
         ; item: items in the box/unit to deliver to the unit
         ; container: addition from problem1 to allow robot_carriers to move more boxes at once
-        patient robot unit box item location container - object
+        patient robot unit box item location container robot_carrier robot_accompany - object
 
         ; sub class of robots since we want to expand the domain to more kinds of robots
         ; robot_carrier: robot that carries boxes to units
         ; robot_accompany: robot that accompanies patients to units
-        robot_carrier robot_accompany - robot
+        ;robot_carrier robot_accompany - robot
 
         ; sub class of items since we want to focus on units having a general item and not a specific instance
         ; eg: care about scalpel, no scalpel5
@@ -26,6 +26,8 @@
         ; is object ?object of type object (robot, patient, unit, box, items) at location ?loc of type location?
         ; used to see if something is at the desired location (eg unit is at specific location)
         (at ?o - object ?loc - location)
+
+        (at_item ?i - item ?loc - location)
 
         ; are location ?loc1 of type location and location ?loc2 of type location connected? 
         ; used to see if two locations are connected, needed as robots can only move between connected locations(rooms)
@@ -233,11 +235,11 @@
             (at start (carrier_free_for_action ?r))
             (at start (at ?r ?loc))
             (at start (at ?b ?loc))
-            (at start (at ?i ?loc))
+            (at start (at_item ?i ?loc))
 
             (over all (at ?r ?loc))
             (over all (at ?b ?loc))
-            (over all (at ?i ?loc))
+            (over all (at_item ?i ?loc))
         )
         :effect (and 
             ; make carrier busy and the box not free, box is for parallelism

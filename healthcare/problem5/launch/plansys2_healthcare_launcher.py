@@ -39,8 +39,7 @@ def generate_launch_description():
             'plansys2_bringup_launch_monolithic.py')),
         launch_arguments={
           'model_file': example_dir + '/pddl/domain.pddl',
-          'namespace': namespace,
-          'planner_plugin': 'plansys2::TemporalFastDownwardPlanner'
+          'namespace': namespace
           }.items())
 
     # Specify the actions
