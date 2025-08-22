@@ -1,36 +1,39 @@
-set instance patientOne patient
-set instance patientTwo patient
+set instance patient_one patient
+set instance patient_two patient
 
-set instance carrierOne robot_carrier
-set instance carrierTwo robot_carrier
+set instance carrier_one robot_carrier
+set instance carrier_two robot_carrier
 
-set instance escorterOne robot_accompany
+set instance escorter_one robot_accompany
 
-set instance containerOne container
-set instance containerTwo container
+set instance container_one container
+set instance container_two container
 
-set instance boxOne box
-set instance boxTwo box
+set instance box_one box
+set instance box_two box
 
-set instance defibrillatorOne defibrillator
-set instance defibrillatorTwo defibrillator
-set instance oxygenOne oxygen
-set instance oxygenTwo oxygen
-set instance ventilatorOne ventilator
-set instance ventilatorTwo ventilator
-set instance feeding_pumpOne feeding_pump
-set instance scalpelOne scalpel
-set instance forcepOne forcep
-
+set instance defibrillator_one defibrillator
+set instance defibrillator_two defibrillator
+set instance oxygen_one oxygen
+set instance oxygen_two oxygen
+set instance ventilator_one ventilator
+set instance ventilator_two ventilator
+set instance feeding_pump_one feeding_pump
+set instance feeding_pump_two feeding_pump
+set instance scalpel_one scalpel
+set instance scalpel_two scalpel
+set instance forcep_one forcep
+set instance forcep_two forcep
 
 set instance entrance location
 set instance central_warehouse location
+
 set instance hallway location
 set instance waiting_room location
 
 set instance emergency_department location
 set instance emergency_trauma unit
-set instance emergency_psychiatric unit 
+set instance emergency_psychiatric unit
 set instance emergency_pediatric unit
 
 set instance intensive_care_department location
@@ -48,8 +51,9 @@ set instance medical_post_surgical unit
 set instance medical_orthopedics unit
 set instance medical_oncology unit
 
-set predicate (are_connected entrance hallway)
 
+
+set predicate (are_connected entrance hallway)
 set predicate (are_connected central_warehouse hallway)
 
 set predicate (are_connected hallway entrance)
@@ -67,75 +71,106 @@ set predicate (are_connected intensive_care_department hallway)
 set predicate (are_connected progressive_care_department hallway)
 set predicate (are_connected medical_department hallway)
 
+
 set predicate (at emergency_trauma emergency_department)
 set predicate (at emergency_psychiatric emergency_department)
+set predicate (at emergency_pediatric emergency_department)
 
-set predicate (at intensive_cardiac intensive_care_department)
 set predicate (at intensive_surgical intensive_care_department)
+set predicate (at intensive_cardiac intensive_care_department)
 set predicate (at intensive_pediatric intensive_care_department)
 
-set predicate (at progressive_cardiac progressive_care_department)
+
 set predicate (at progressive_surgical progressive_care_department)
+set predicate (at progressive_cardiac progressive_care_department)
 set predicate (at progressive_pediatric progressive_care_department)
 
 set predicate (at medical_post_surgical medical_department)
-set predicate (at medical_orthopedics  medical_department)
+set predicate (at medical_orthopedics medical_department)
 set predicate (at medical_oncology medical_department)
 
-set predicate (at escorterOne entrance)
-set predicate (at patientOne entrance)
-set predicate (at patientTwo entrance)
-set predicate (needs_escorting patientOne)
-set predicate (needs_escorting patientTwo)
-set predicate (patient_free patientOne)
-set predicate (patient_free patientTwo)
-set predicate (escorter_free escorterOne)
-set predicate (escorter_free_for_action escorterOne)
-set predicate (needs_to_reach patientOne emergency_trauma)
-set predicate (needs_to_reach patientTwo intensive_cardiac)
 
-set predicate (at carrierOne central_warehouse)
-set predicate (carrier_free carrierOne)
-set predicate (carrier_free_for_action carrierOne)
+set predicate (at escorter_one entrance)
+set predicate (at patient_one entrance)
+set predicate (at patient_two entrance)
 
-set predicate (at carrierTwo central_warehouse)
-set predicate (carrier_free carrierTwo)
-set predicate (carrier_free_for_action carrierTwo)
+set predicate (needs_escorting patient_one)
+set predicate (needs_escorting patient_two)
 
-set predicate (at boxOne central_warehouse)
-set predicate (box_free boxOne)
-set predicate (is_empty boxOne)
+set predicate (patient_free patient_one)
+set predicate (patient_free patient_two)
 
-set predicate (at boxTwo central_warehouse)
-set predicate (box_free boxTwo)
-set predicate (is_empty boxTwo)
+set predicate (escorter_free escorter_one)
+set predicate (escorter_free_for_action escorter_one)
 
-set predicate (at_item defibrillatorOne central_warehouse)
-set predicate (at_item defibrillatorTwo central_warehouse)
-set predicate (at_item oxygenOne central_warehouse)
-set predicate (at_item oxygenTwo central_warehouse)
-set predicate (at_item ventilatorOne central_warehouse)
-set predicate (at_item ventilatorTwo central_warehouse)
-set predicate (at_item feeding_pumpOne central_warehouse)
-set predicate (at_item scalpelOne central_warehouse)
-set predicate (at_item forcepOne central_warehouse)
+set predicate (needs_to_reach patient_one emergency_trauma)
+set predicate (needs_to_reach patient_two intensive_cardiac)
 
-set predicate (need_item emergency_trauma defibrillatorOne)
-set predicate (need_item emergency_trauma defibrillatorTwo)
-set predicate (need_item emergency_psychiatric oxygenOne)
-set predicate (need_item intensive_cardiac feeding_pumpOne)
+set predicate (at carrier_one central_warehouse)
+set predicate (carrier_free carrier_one)
+set predicate (carrier_free_for_action carrier_one)
+
+set predicate (at carrier_two central_warehouse)
+set predicate (carrier_free carrier_two)
+set predicate (carrier_free_for_action carrier_two)
+
+set predicate (at box_one central_warehouse)
+set predicate (at box_two central_warehouse)
+
+set predicate (is_empty box_one)
+set predicate (is_empty box_two)
+
+set predicate (box_free box_one)
+set predicate (box_free box_two)
+
+set predicate (at_item defibrillator_one central_warehouse)
+set predicate (at_item defibrillator_two central_warehouse)
+set predicate (at_item oxygen_one central_warehouse)
+set predicate (at_item oxygen_two central_warehouse)
+set predicate (at_item ventilator_one central_warehouse)
+set predicate (at_item ventilator_two central_warehouse)
+set predicate (at_item feeding_pump_one central_warehouse)
+set predicate (at_item feeding_pump_two central_warehouse)
+set predicate (at_item scalpel_one central_warehouse)
+set predicate (at_item scalpel_two central_warehouse)
+set predicate (at_item forcep_one central_warehouse)
+set predicate (at_item forcep_two central_warehouse)
 
 
-set predicate (at containerOne central_warehouse)
-set predicate (at containerTwo central_warehouse)
-set predicate (container_free containerOne)
-set predicate (container_free containerTwo)
-set function (container_capacity containerOne) 2
-set function (container_capacity containerTwo) 3
-set function (container_load containerOne) 0
-set function (container_load containerTwo) 0
+set predicate (item_free defibrillator_one)
+set predicate (item_free defibrillator_two)
+set predicate (item_free oxygen_one)
+set predicate (item_free oxygen_two)
+set predicate (item_free ventilator_one)
+set predicate (item_free ventilator_two)
+set predicate (item_free feeding_pump_one)
+set predicate (item_free feeding_pump_two)
+set predicate (item_free scalpel_one)
+set predicate (item_free scalpel_two)
+set predicate (item_free forcep_one)
+set predicate (item_free forcep_two)
 
-set goal (and (at_item defibrillatorOne central_warehouse))
+
+set predicate (need_item emergency_trauma defibrillator_one)
+set predicate (need_item emergency_psychiatric oxygen_one)
+set predicate (need_item intensive_cardiac feeding_pump_one)
+set predicate (need_item progressive_surgical scalpel_one)
+
+
+set predicate (at container_one central_warehouse)
+set predicate (at container_two central_warehouse)
+
+set predicate (container_free container_one)
+set predicate (container_free container_two)
+
+set function (container_capacity container_one) 2
+set function (container_capacity container_two) 3
+
+set function (container_load container_one) 0
+set function (container_load container_two) 0
+
+
+set goal (and (has_reached patient_one emergency_trauma) (has_reached patient_two intensive_cardiac) (has_item emergency_trauma defibrillator_one))
 
 
 

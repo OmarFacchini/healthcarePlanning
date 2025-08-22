@@ -26,7 +26,7 @@ class DropOffPatient : public plansys2::ActionExecutorClient
 {
 public:
   DropOffPatient ()
-  : plansys2::ActionExecutorClient("dropoffpatient", 250ms)
+  : plansys2::ActionExecutorClient("drop_off_patient", 250ms)
   {
     progress_ = 0.0;
   }
@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto node = std::make_shared<DropOffPatient >();
 
-  node->set_parameter(rclcpp::Parameter("action_name", "dropoffpatient"));
+  node->set_parameter(rclcpp::Parameter("action_name", "drop_off_patient"));
   node->set_parameter(rclcpp::Parameter("rate", 1.0));
   node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
 

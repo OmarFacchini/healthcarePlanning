@@ -23,13 +23,6 @@ RUN mkdir -p ~/plansys2_ws/src && \
 
 RUN cd ~/plansys2_ws && rosdep install -y -r -q --from-paths src --ignore-src --rosdistro ${ROS_DISTRO}
 
-RUN cd ~/plansys2_ws/src && \
-    git clone https://github.com/PlanSys2/ros2_planning_system_examples.git && \
-    cd ros2_planning_system_examples && \
-    git checkout ${ROS_DISTRO}
-
-RUN cd ~/plansys2_ws && rosdep install -y -r -q --from-paths src --ignore-src --rosdistro ${ROS_DISTRO}
-
 RUN apt-get install -y vim gdb terminator
 
 RUN cd ~/plansys2_ws && source /opt/ros/${ROS_DISTRO}/setup.bash && colcon build --symlink-install
@@ -43,3 +36,13 @@ CMD /bin/bash
 # sudo docker run -v /tmp/.X11-unix/:/tmp/.X11-unix/ --volume="$HOME/.Xauthority:/root/.Xauthority:rw" --network=host --name ubuntu_bash --env="DISPLAY" --rm -i -t ros-humble bash
 # Or
 # sudo docker run -v /tmp/.X11-unix/:/tmp/.X11-unix/ --volume="$HOME/.Xauthority:/root/.Xauthority:rw" --network=host --name ubuntu_bash --env="DISPLAY" --rm -i -t docker.io/library/ros-humble:latest bash 
+
+# sudo docker build -t ros -f Dockerfile.ROS .
+# sudo docker run -it --rm --network=host --name ubuntu_bash --env="DISPLAY" -v /tmp/.X11-unix/:/tmp/.X11-unix/ --volume="$HOME/.Xauthority:/root/.Xauthority:rw" -v $HOME/Desktop/healthcarePlanning/healthcare/problem5:/root/problem5 -t ros bash
+#cd ~/plansys2_ws/src
+#ln -s /root/problem5 .
+#cd ~/plansys2_ws
+#source /opt/ros/$ROS_DISTRO/setup.bash
+#colcon build --symlink-install --packages-select problem5
+# source install/setup.bash
+# ros2 launch problem5 plansys2_healthcare_launcher.py

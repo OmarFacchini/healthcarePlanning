@@ -26,7 +26,7 @@ class DeployBox : public plansys2::ActionExecutorClient
 {
 public:
   DeployBox ()
-  : plansys2::ActionExecutorClient("deploybox", 250ms)
+  : plansys2::ActionExecutorClient("deploy_box", 250ms)
   {
     progress_ = 0.0;
   }
@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto node = std::make_shared<DeployBox >();
 
-  node->set_parameter(rclcpp::Parameter("action_name", "deploybox"));
+  node->set_parameter(rclcpp::Parameter("action_name", "deploy_box"));
   node->set_parameter(rclcpp::Parameter("rate", 1.0));
   node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
 

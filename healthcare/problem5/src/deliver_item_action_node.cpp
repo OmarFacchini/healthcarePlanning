@@ -26,7 +26,7 @@ class DeliverItem : public plansys2::ActionExecutorClient
 {
 public:
   DeliverItem ()
-  : plansys2::ActionExecutorClient("deliveritem", 250ms)
+  : plansys2::ActionExecutorClient("deliver_item", 250ms)
   {
     progress_ = 0.0;
   }
@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto node = std::make_shared<DeliverItem >();
 
-  node->set_parameter(rclcpp::Parameter("action_name", "deliveritem"));
+  node->set_parameter(rclcpp::Parameter("action_name", "deliver_item"));
   node->set_parameter(rclcpp::Parameter("rate", 1.0));
   node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
 

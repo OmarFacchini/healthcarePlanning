@@ -26,7 +26,7 @@ class InsertBox : public plansys2::ActionExecutorClient
 {
 public:
   InsertBox ()
-  : plansys2::ActionExecutorClient("insertbox", 250ms)
+  : plansys2::ActionExecutorClient("insert_box", 250ms)
   {
     progress_ = 0.0;
   }
@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto node = std::make_shared<InsertBox >();
 
-  node->set_parameter(rclcpp::Parameter("action_name", "insertbox"));
+  node->set_parameter(rclcpp::Parameter("action_name", "insert_box"));
   node->set_parameter(rclcpp::Parameter("rate", 1.0));
   node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
 

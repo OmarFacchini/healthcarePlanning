@@ -26,7 +26,7 @@ class InsertItem : public plansys2::ActionExecutorClient
 {
 public:
   InsertItem ()
-  : plansys2::ActionExecutorClient("insertitem", 250ms)
+  : plansys2::ActionExecutorClient("insert_item", 250ms)
   {
     progress_ = 0.0;
   }
@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   auto node = std::make_shared<InsertItem >();
 
-  node->set_parameter(rclcpp::Parameter("action_name", "insertitem"));
+  node->set_parameter(rclcpp::Parameter("action_name", "insert_item"));
   node->set_parameter(rclcpp::Parameter("rate", 1.0));
   node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
 

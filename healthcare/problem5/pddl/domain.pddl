@@ -105,6 +105,8 @@
         ; is the escorter free to do an action?
         ; similar to escorter_free but for the durative action
         (escorter_free_for_action ?r - robot_accompany)
+
+        (item_free ?i - item)
     )
 
 
@@ -236,6 +238,7 @@
             (at start (at ?r ?loc))
             (at start (at ?b ?loc))
             (at start (at_item ?i ?loc))
+            (at start (item_free ?i))
 
             (over all (at ?r ?loc))
             (over all (at ?b ?loc))
@@ -246,6 +249,7 @@
             (at start (not (carrier_free_for_action ?r))) 
             (at start (not (carrier_free ?r)))
             (at start (not (box_free ?b)))
+            (at start (not (item_free ?i))) 
 
             (at end (not (is_empty ?b)))
             (at end (inside ?i ?b))
