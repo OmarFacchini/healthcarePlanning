@@ -2,7 +2,7 @@
 Projects for Automated Planning course of the master degree in Artificial Intelligence Systems (AIS) at UniTN
 
 # Setup
-## Problems 1, 2 and 4
+## Problems 1-4
 These problems require the usage of some planners that can be easily retrieved with planutils.
 For simplicity a dockerfile is provided, to utilize it simply build it and run it by doing:
 ```
@@ -13,10 +13,7 @@ And then run the container by doing:
 sudo docker run -v ./healthcare:/computer -it --privileged --rm myplanutils bash
 ```
 
-Note: only run it with the intention of testing the problems as to avoid issues with the others.
-
-# Problem 3
-For this problem there is no setup needed as the planner is already provided in the form of a `.jar` file.
+Note: only run it with the intention of testing the problems as to avoid issues with the last problem.
 
 # Problem 5
 Similarly to before, a dockerfile is provided and is locate in the problem5 folder, to build do:
